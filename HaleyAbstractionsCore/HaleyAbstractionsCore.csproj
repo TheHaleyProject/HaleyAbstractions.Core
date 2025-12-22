@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\HaleyProject\HaleyVersion.Props" />
+  <PropertyGroup>
+	  <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <SignAssembly>true</SignAssembly>
+	  <AssemblyOriginatorKeyFile>..\..\HaleyProject\HaleyProject.snk</AssemblyOriginatorKeyFile>
+	  <AssemblyName>Haley.Abstractions.Core</AssemblyName>
+	  <PackageId>Haley.Abstractions.Core</PackageId>
+	  <RootNamespace>Haley</RootNamespace>
+	  <Description>Abstractions needed for dot net 8 and above.</Description>
+	  <Company>TheHaleyProject</Company>
+	  <Authors>TheHaleyProject</Authors>
+	  <Copyright>Haley 2020</Copyright>
+	  <PackageIcon>..\..\HaleyProject\Haley.png</PackageIcon>
+	  <AssemblyVersion>1.0.0.0</AssemblyVersion>
+	  <FileVersion>1.0.0.0</FileVersion>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <Product>Haley Abstractiosn Core</Product>
+	  <Version>$(HaleyAbstractionsCoreVersion)</Version>
+	  <PackageProjectUrl>https://github.com/TheHaleyProject/HaleyAbstractions.Core</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/TheHaleyProject/HaleyAbstractions.Core</RepositoryUrl>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <IncludeSymbols>true</IncludeSymbols>
+	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	  <PackageReleaseNotes>Pilot</PackageReleaseNotes>
+	  <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
+
+	<Import Project="$(SolutionDir)ProjectReferences_$(SolutionName).txt" Condition="Exists('$(SolutionDir)ProjectReferences_$(SolutionName).txt')" />
+	<Choose>
+		<When Condition="Exists($(HaleyAbstractions))">
+			<ItemGroup>
+				<ProjectReference Include="$(HaleyAbstractions)\HaleyAbstractions.csproj">
+					<Name>HaleyAbstractions</Name>
+				</ProjectReference>
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<PackageReference Include="Haley.Abstractions" Version="$(HaleyAbstractionsVersion)" />
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
+</Project>
