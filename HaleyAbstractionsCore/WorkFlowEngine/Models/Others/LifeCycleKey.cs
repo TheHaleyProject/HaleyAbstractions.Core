@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Haley.Models {
     //public readonly record struct LifeCycleKey(LifeCycleKeyType Type, object A, object? B = null);
-    public readonly record struct LifeCycleKey(LifeCycleKeyType Type, params object[] keys);
+    public readonly record struct LifeCycleKey(WorkFlowEntityKeyType Type, params object[] keys);
 }

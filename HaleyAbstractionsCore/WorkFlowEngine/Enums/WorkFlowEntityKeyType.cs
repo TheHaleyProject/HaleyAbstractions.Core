@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
     namespace Haley.Enums {
-        public enum LifeCycleKeyType {
+        public enum WorkFlowEntityKeyType {
             None = 0,
             Id,
             Guid,

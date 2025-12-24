@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
     namespace Haley.Enums {
-        public enum LifeCycleAckStatus {
+        public enum WorkFlowAckStatus {
             Pending =1,
             Delivered=2,
             Processed=3,

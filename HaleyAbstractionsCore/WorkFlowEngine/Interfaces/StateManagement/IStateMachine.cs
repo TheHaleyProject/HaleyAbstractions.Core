@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface ILifeCycleProcessor :ILifeCycleCore {
+    public interface IStateMachine {
         event Func<TransitionOccurred, Task>? TransitionRaised;
         event Func<LifeCycleError, Task>? ErrorRaised;
         event Func<TimeoutNotification, Task>? TimeoutRaised;
@@ -17,7 +17,7 @@ namespace Haley.Abstractions {
         // Instance lifecycle
         Task<LifeCycleInstance?> GetInstanceWithTransitionAsync(LifeCycleKey instanceKey);
         Task<LifeCycleInstance?> GetInstanceAsync(LifeCycleKey instanceKey);
-        Task<bool> InitializeAsync(LifeCycleKey instanceKey, LifeCycleInstanceFlag flags = LifeCycleInstanceFlag.Active);
+        Task<bool> InitializeAsync(LifeCycleKey instanceKey, WorkFlowInstanceFlag flags = WorkFlowInstanceFlag.Active);
         Task<LifeCycleState> GetCurrentStateAsync(LifeCycleKey instanceKey);
 
 
@@ -36,7 +36,7 @@ namespace Haley.Abstractions {
         Task<IFeedback<DefinitionLoadResult>> ImportDefinitionFromFileAsync(string filePath, string environmentName = "default", int envCode = 0);
 
         // Ack pass-through
-        Task<IFeedback<Dictionary<string, object>>> InsertAck(long transitionLogId, int consumer, LifeCycleAckStatus status = LifeCycleAckStatus.Pending, string? messageId = null);
-        Task<IFeedback<bool>> MarkAck(string messageId, LifeCycleAckStatus status);
+        Task<IFeedback<Dictionary<string, object>>> InsertAck(long transitionLogId, int consumer, WorkFlowAckStatus status = WorkFlowAckStatus.Pending, string? messageId = null);
+        Task<IFeedback<bool>> MarkAck(string messageId, WorkFlowAckStatus status);
     }
 }

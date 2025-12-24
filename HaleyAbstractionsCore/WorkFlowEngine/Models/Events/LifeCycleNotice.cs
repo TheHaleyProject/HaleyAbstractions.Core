@@ -13,6 +13,6 @@ namespace Haley.Models {
         public object Data { get; set; }
         public string Message { get; set; }
         public DateTime TimeStamp { get; init; } = DateTime.UtcNow;
-        public LifeCyceNoticeKind Kind { get; set; }
+        public WorkFlowNoticeKind Kind { get; set; }
     }
 }

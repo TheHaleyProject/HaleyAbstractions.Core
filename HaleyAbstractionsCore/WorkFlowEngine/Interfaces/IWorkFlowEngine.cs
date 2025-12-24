@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface ILifeCycleLedger {
+    public interface IWorkFlowEngine : IStateMachine, IPolicyEngine, ITaskLedger, IEventRouter {
       
     }
 }

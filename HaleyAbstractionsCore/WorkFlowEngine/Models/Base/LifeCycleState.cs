@@ -8,7 +8,7 @@ namespace Haley.Models {
         public string DisplayName { get; set; } = "";
         public string Name { get; set; } = "";
         public int Category { get; set; }          // category id
-        public LifeCycleStateFlag Flags { get; set; }
+        public WorkFlowStateFlag Flags { get; set; }
         public int? TimeoutMinutes { get; set; }          // minutes
         public int TimeoutMode { get; set; }       // 0=once,1=repeat
         public int? TimeoutEvent { get; set; }     // event id

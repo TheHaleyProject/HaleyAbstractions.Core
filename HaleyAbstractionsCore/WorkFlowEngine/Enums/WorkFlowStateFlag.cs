@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Haley.Enums {
     [Flags]
-    public enum LifeCycleStateFlag : int {
+    public enum WorkFlowStateFlag : int {
         None =0,
         IsInitial = 1 << 0, //1
         IsFinal = 1 << 1, //2

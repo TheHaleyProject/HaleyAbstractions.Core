@@ -3,7 +3,7 @@
 namespace Haley.Enums {
 
     [Flags]
-    public enum LifeCycleInstanceFlag : int {
+    public enum WorkFlowInstanceFlag : int {
         None = 0,
         Active = 1 << 0,
         Suspended = 1 << 1,

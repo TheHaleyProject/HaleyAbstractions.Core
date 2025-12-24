@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
     namespace Haley.Enums {
-        public enum LifeCycleAckFetchMode {
+        public enum WorkFlowAckFetchMode {
             DueForRetry,
             Failed
         }
