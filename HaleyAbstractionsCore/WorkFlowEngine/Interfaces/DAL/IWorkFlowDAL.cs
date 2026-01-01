@@ -1,0 +1,23 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Haley.Enums;
+using Haley.Models;
+
+namespace Haley.Abstractions {
+    public interface IWorkFlowDAL : IWorkFlowDb {
+        IBlueprintReadDAL Blueprint { get; }
+        IInstanceDAL Instance { get; }
+        ILifeCycleDAL LifeCycle { get; }
+        ILifeCycleDataDAL LifeCycleData { get; }
+        IHookDAL Hook { get; }
+        IAckDAL Ack { get; }
+        ILcAckDAL LcAck { get; }
+        IHookAckDAL HookAck { get; }
+        IAckDispatchDAL AckDispatch { get; }
+        IActivityDAL Activity { get; }
+        IActivityStatusDAL ActivityStatus { get; }
+        IRuntimeDAL Runtime { get; }
+        IRuntimeDataDAL RuntimeData { get; }
+    }
+}
