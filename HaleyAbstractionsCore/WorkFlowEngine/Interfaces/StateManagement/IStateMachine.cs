@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface IStateMachine: IStateAckBus {
+    public interface IStateMachine: ITransitionAckBus {
         event Func<TransitionOccurred, Task>? TransitionRaised;
         event Func<LifeCycleError, Task>? ErrorRaised;
         event Func<TimeoutNotification, Task>? TimeoutRaised;
