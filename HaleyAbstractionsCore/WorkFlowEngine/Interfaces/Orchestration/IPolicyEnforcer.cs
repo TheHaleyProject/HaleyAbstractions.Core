@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface IPolicyEngine : ITaskAckBus {
+    public interface IPolicyEnforcer : ITaskAckBus {
       
     }
 }
