@@ -6,7 +6,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface IRuntimeDataDAL {
-        Task<DbRow?> GetByIdAsync(long runtimeId, CancellationToken ct = default);
-        Task<int> UpsertAsync(long runtimeId, string? data, string? payload, CancellationToken ct = default);
+        Task<DbRow?> GetByIdAsync(long runtimeId, DbExecutionLoad load = default);
+        Task<int> UpsertAsync(long runtimeId, string? dataJson, string? payloadJson, DbExecutionLoad load = default);
     }
 }

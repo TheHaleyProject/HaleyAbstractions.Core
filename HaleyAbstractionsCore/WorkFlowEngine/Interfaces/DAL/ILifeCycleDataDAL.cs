@@ -6,7 +6,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface ILifeCycleDataDAL {
-        Task<DbRow?> GetByIdAsync(long lcId, CancellationToken ct = default);
-        Task<int> UpsertAsync(long lcId, string? actor, string? payload, CancellationToken ct = default);
+        Task<DbRow?> GetByIdAsync(long lifeCycleId, DbExecutionLoad load = default);
+        Task<int> UpsertAsync(long lifeCycleId, string? actor, string? payloadJson, DbExecutionLoad load = default);
     }
 }

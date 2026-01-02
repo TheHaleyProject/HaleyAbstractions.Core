@@ -6,8 +6,10 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface IHookDAL {
-        Task<long> UpsertByKeyReturnIdAsync(long instanceId, int stateId, int viaEventId, bool onEntry, string route, CancellationToken ct = default);
-        Task<DbRows> ListByInstanceAsync(long instanceId, CancellationToken ct = default);
-        Task<int> DeleteByInstanceAsync(long instanceId, CancellationToken ct = default);
+        Task<DbRow?> GetByIdAsync(long hookId, DbExecutionLoad load = default);
+        Task<DbRow?> GetByKeyAsync(long instanceId, long stateId, long? viaEventId, bool onEntry, string hookCode, DbExecutionLoad load = default);
+        Task<long> UpsertByKeyReturnIdAsync(long instanceId, long stateId, long? viaEventId, bool onEntry, string hookCode, string? payloadJson, DbExecutionLoad load = default);
+        Task<DbRows> ListByInstanceAsync(long instanceId, DbExecutionLoad load = default);
+        Task<int> DeleteByInstanceAsync(long instanceId, DbExecutionLoad load = default);
     }
 }

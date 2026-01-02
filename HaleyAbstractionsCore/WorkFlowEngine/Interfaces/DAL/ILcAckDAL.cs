@@ -6,7 +6,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface ILcAckDAL {
-        Task<int> AttachAsync(long ackId, long lcId, CancellationToken ct = default);
-        Task<int> DetachAsync(long ackId, long lcId, CancellationToken ct = default);
+        Task<int> AttachAsync(long ackId, long lcId, DbExecutionLoad load = default);
+        Task<int> DetachAsync(long ackId, long lcId, DbExecutionLoad load = default);
     }
 }

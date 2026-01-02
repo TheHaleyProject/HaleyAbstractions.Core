@@ -6,8 +6,10 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface IAckDAL {
-        Task<long> UpsertByConsumerAndSourceReturnIdAsync(long consumer, long source, int ackStatus, CancellationToken ct = default);
-        Task<int> SetStatusAsync(long ackId, int ackStatus, CancellationToken ct = default);
-        Task<int> MarkRetryAsync(long ackId, CancellationToken ct = default);
+        Task<DbRow?> GetByIdAsync(long ackId, DbExecutionLoad load = default);
+        Task<long> UpsertByConsumerAndSourceReturnIdAsync(long consumer, long source, int ackStatus, DbExecutionLoad load = default);
+        Task<int> SetStatusAsync(long ackId, int ackStatus, DbExecutionLoad load = default);
+        Task<int> MarkRetryAsync(long ackId, DbExecutionLoad load = default);
+        Task<int> SetNotBeforeAsync(long ackId, DateTime utcNotBefore, DbExecutionLoad load = default);
     }
 }

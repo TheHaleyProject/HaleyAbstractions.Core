@@ -6,7 +6,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface IAckDispatchDAL {
-        Task<DbRows> ListPendingLifecycleReadyPagedAsync(int ackStatus, DateTime olderThan, int skip, int take, CancellationToken ct = default);
-        Task<DbRows> ListPendingHookReadyPagedAsync(int ackStatus, DateTime olderThan, int skip, int take, CancellationToken ct = default);
+        Task<DbRows> ListPendingLifecycleReadyPagedAsync(int ackStatus, DateTime utcOlderThan, int skip, int take, DbExecutionLoad load = default);
+        Task<DbRows> ListPendingHookReadyPagedAsync(int ackStatus, DateTime utcOlderThan, int skip, int take, DbExecutionLoad load = default);
     }
 }

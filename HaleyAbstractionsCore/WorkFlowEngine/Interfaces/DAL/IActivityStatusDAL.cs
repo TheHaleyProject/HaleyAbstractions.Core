@@ -6,7 +6,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface IActivityStatusDAL {
-        Task<DbRows> ListAllAsync(CancellationToken ct = default);
-        Task<DbRow?> GetByNameAsync(string name, CancellationToken ct = default);
+        Task<DbRows> ListAllAsync(DbExecutionLoad load = default);
+        Task<DbRow?> GetByNameAsync(string name, DbExecutionLoad load = default);
     }
 }

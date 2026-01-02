@@ -6,11 +6,16 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface IInstanceDAL {
-        Task<DbRow?> GetByIdAsync(long id, CancellationToken ct = default);
-        Task<DbRow?> GetByDefVersionAndExternalRefAsync(int defVersionId, string externalRef, CancellationToken ct = default);
-        Task<long> UpsertByDefVersionAndExternalRefReturnIdAsync(int defVersionId, string externalRef, int currentStateId, int? lastEventId, int policyId, uint flags, CancellationToken ct = default);
-        Task<int> UpdateCurrentStateCasAsync(long id, int expectedFromStateId, int newToStateId, int? lastEventId, CancellationToken ct = default);
-        Task<int> AddFlagsAsync(long id, uint flags, CancellationToken ct = default);
-        Task<int> RemoveFlagsAsync(long id, uint flags, CancellationToken ct = default);
+        Task<DbRow?> GetByIdAsync(long instanceId, DbExecutionLoad load = default);
+        Task<DbRow?> GetByKeyAsync(long defVersionId, string externalRef, DbExecutionLoad load = default);
+
+        Task<long> UpsertAsync(long defVersionId, string externalRef, long currentStateId, long? lastEventId, long policyId, uint flags, DbExecutionLoad load = default);
+
+        Task<int> UpdateCurrentStateCasAsync(long instanceId, long expectedFromStateId, long newToStateId, long? lastEventId, DbExecutionLoad load = default);
+
+        Task<int> SetPolicyAsync(long instanceId, long policyId, DbExecutionLoad load = default);
+        Task<int> AddFlagsAsync(long instanceId, uint flags, DbExecutionLoad load = default);
+        Task<int> RemoveFlagsAsync(long instanceId, uint flags, DbExecutionLoad load = default);
     }
+
 }
