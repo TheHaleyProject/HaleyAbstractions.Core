@@ -10,6 +10,5 @@ namespace Haley.Abstractions {
         Task<long> UpsertByConsumerAndSourceReturnIdAsync(long consumer, long source, int ackStatus, DbExecutionLoad load = default);
         Task<int> SetStatusAsync(long ackId, int ackStatus, DbExecutionLoad load = default);
         Task<int> MarkRetryAsync(long ackId, DbExecutionLoad load = default);
-        Task<int> SetNotBeforeAsync(long ackId, DateTime utcNotBefore, DbExecutionLoad load = default);
     }
 }
