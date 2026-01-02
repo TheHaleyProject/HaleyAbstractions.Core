@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface IWorkFlowDAL : IWorkFlowDb {
+    public interface IWorkFlowDAL : IWorkFlowDALUtil {
         IBlueprintReadDAL Blueprint { get; }
         IInstanceDAL Instance { get; }
         ILifeCycleDAL LifeCycle { get; }
