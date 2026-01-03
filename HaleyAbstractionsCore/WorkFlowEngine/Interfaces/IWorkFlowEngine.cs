@@ -10,8 +10,7 @@ namespace Haley.Abstractions {
         IBlueprintManager? BlueprintManager { get; }
         IPolicyEnforcer? PolicyEnforcer { get; }
         IAckManager? AckManager { get; }
-        IInstanceMonitor? InstanceMonitor { get; }
-        IConsumerRegistry? ConsumerRegistry { get; }
+        IRuntimeEngine Runtime { get; }
         IWorkFlowDAL? Dal { get; }
         Task StartAsync(CancellationToken ct = default);
         Task StopAsync(CancellationToken ct = default);
