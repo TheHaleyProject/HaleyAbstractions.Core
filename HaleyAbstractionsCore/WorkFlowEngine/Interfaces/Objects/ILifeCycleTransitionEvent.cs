@@ -13,11 +13,8 @@ namespace Haley.Abstractions {
         int EventCode { get; }
         string EventName { get; }
         IReadOnlyDictionary<string, object?>? PrevStateMeta { get; }
-
-        // policy attached to this transition/state (full json content)
         long? PolicyId { get; }
         string? PolicyHash { get; }
         string? PolicyJson { get; }
     }
-
 }

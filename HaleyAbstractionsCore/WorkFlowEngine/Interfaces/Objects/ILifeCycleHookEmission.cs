@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface ILifeCycleHookEvent : ILifeCycleEvent {
+    public interface ILifeCycleHookEmission {
         long HookId { get; }
         long StateId { get; }
         bool OnEntry { get; }
@@ -14,6 +14,6 @@ namespace Haley.Abstractions {
         string? OnFailureEvent { get; }
         DateTimeOffset? NotBefore { get; }
         DateTimeOffset? Deadline { get; }
+        IReadOnlyDictionary<string, object?>? Payload { get; } // ephemeral (NOT stored)
     }
-
 }

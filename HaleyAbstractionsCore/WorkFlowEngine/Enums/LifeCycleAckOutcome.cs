@@ -4,8 +4,9 @@ using System.Text;
 
 namespace Haley.Enums {
     public enum LifeCycleAckOutcome { 
-        Success, 
-        Failure, 
-        Retry 
+        Delivered = 1, 
+        Processed = 2, 
+        Failed = 3, 
+        Retry = 4 
     }
 }

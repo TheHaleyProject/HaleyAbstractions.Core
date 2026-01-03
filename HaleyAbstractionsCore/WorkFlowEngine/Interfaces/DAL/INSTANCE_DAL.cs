@@ -20,8 +20,8 @@ namespace Haley.Abstractions {
 
     public interface IHookDAL {
         Task<DbRow?> GetByIdAsync(long hookId, DbExecutionLoad load = default);
-        Task<DbRow?> GetByKeyAsync(long instanceId, long stateId, long? viaEventId, bool onEntry, string route, DbExecutionLoad load = default);
-        Task<long> UpsertByKeyReturnIdAsync(long instanceId, long stateId, long? viaEventId, bool onEntry, string route, string? payloadJson, DbExecutionLoad load = default);
+        Task<DbRow?> GetByKeyAsync(long instanceId, long stateId, long viaEventId, bool onEntry, string route, DbExecutionLoad load = default);
+        Task<long> UpsertByKeyReturnIdAsync(long instanceId, long stateId, long viaEventId, bool onEntry, string route, DbExecutionLoad load = default);
         Task<DbRows> ListByInstanceAsync(long instanceId, DbExecutionLoad load = default);
         Task<DbRows> ListByInstanceAndStateAsync(long instanceId, long stateId, DbExecutionLoad load = default);
         Task<int> DeleteAsync(long hookId, DbExecutionLoad load = default);
