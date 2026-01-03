@@ -12,7 +12,7 @@ namespace Haley.Abstractions {
         string ExternalRef { get; }
         string? RequestId { get; }
         DateTimeOffset OccurredAt { get; }
-        long AckId { get; }          // can be 0 for notice if you want
+        string AckGuid { get; }         //String GUID
         bool AckRequired { get; }
         IReadOnlyDictionary<string, object?>? Payload { get; }
     }

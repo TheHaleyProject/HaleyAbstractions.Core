@@ -14,6 +14,6 @@ namespace Haley.Models {
         public long ToStateId { get; set; }
         public long EventId { get; set; }
         public int EventCode { get; set; }
-        public string EventName { get; set; } = "";
+        public string EventName { get; set; } = string.Empty;
     }
 }
