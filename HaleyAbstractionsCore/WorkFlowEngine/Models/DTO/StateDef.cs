@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Haley.Models {
     public sealed class StateDef {
-        public long Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string DisplayName { get; set; }
         public uint Flags { get; set; }

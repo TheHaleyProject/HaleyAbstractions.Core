@@ -13,6 +13,7 @@ namespace Haley.Models {
         public string Event { get; set; }
         public string Actor { get; set; }
         public string RequestId { get; set; }
+        public bool AckRequired { get; set; } = true;
         public IReadOnlyDictionary<string, object> Payload { get; set; }
         public LifeCycleTriggerRequest() { }
     }

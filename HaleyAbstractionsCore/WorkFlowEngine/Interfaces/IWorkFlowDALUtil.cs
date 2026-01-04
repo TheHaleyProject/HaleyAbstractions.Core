@@ -11,5 +11,6 @@ namespace Haley.Abstractions {
         Task<T?> ScalarAsync<T>(string sql, DbExecutionLoad load = default , params DbArg[] args);
         Task<DbRow?> RowAsync(string sql, DbExecutionLoad load = default, params DbArg[] args);
         Task<DbRows> RowsAsync(string sql, DbExecutionLoad load = default, params DbArg[] args);
+        ITransactionHandler CreateNewTransaction();
     }
 }

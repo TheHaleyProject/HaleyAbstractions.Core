@@ -7,6 +7,7 @@ using Haley.Models;
 namespace Haley.Abstractions {
     public interface IWorkFlowDAL : IWorkFlowDALUtil {
         IBlueprintReadDAL Blueprint { get; }
+        IBlueprintWriteDAL BlueprintWrite { get; }
         IInstanceDAL Instance { get; }
         ILifeCycleDAL LifeCycle { get; }
         ILifeCycleDataDAL LifeCycleData { get; }

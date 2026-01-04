@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Haley.Models {
     public sealed class EventDef {
-        public long Id { get; set; }
+        public int Id { get; set; }
         public int Code { get; set; }
         public string Name { get; set; }
         public string DisplayName { get; set; }

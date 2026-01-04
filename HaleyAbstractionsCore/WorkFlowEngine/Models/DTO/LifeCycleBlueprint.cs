@@ -15,7 +15,7 @@ namespace Haley.Models {
         public IReadOnlyDictionary<long, EventDef> EventsById { get; set; }
         public IReadOnlyDictionary<string, EventDef> EventsByName { get; set; }
         public IReadOnlyDictionary<int, EventDef> EventsByCode { get; set; }
-        public IReadOnlyDictionary<Tuple<long, long>, TransitionDef> Transitions { get; set; }
+        public IReadOnlyDictionary<Tuple<long, int>, TransitionDef> Transitions { get; set; }
         public long InitialStateId { get; set; }
         public LifeCycleBlueprint() { }
     }
