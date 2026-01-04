@@ -13,7 +13,7 @@
 	  <Company>TheHaleyProject</Company>
 	  <Authors>TheHaleyProject</Authors>
 	  <Copyright>Haley 2020</Copyright>
-	  <PackageIcon>..\..\HaleyProject\Haley.png</PackageIcon>
+	  <PackageIcon>Haley.png</PackageIcon>
 	  <AssemblyVersion>1.0.0.0</AssemblyVersion>
 	  <FileVersion>1.0.0.0</FileVersion>
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -28,7 +28,14 @@
 	  <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <ItemGroup>
+    <None Include="..\..\HaleyProject\Haley.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>portable</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
