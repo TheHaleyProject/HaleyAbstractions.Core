@@ -5,7 +5,6 @@ using System.Text;
 namespace Haley.Enums {
     public enum LifeCycleEventKind { 
         Transition, 
-        Hook, 
-        Notice 
+        Hook
     }
 }

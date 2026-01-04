@@ -10,11 +10,11 @@ namespace Haley.Models {
     public sealed class LifeCycleDispatchItem : ILifeCycleDispatchItem {
         public LifeCycleDispatchKind Kind { get; set; }
         public long AckId { get; set; }
-        public string AckGuid { get; set; }
+        public string AckGuid { get; set; } = string.Empty;
         public long ConsumerId { get; set; }
         public int AckStatus { get; set; }
         public int RetryCount { get; set; }
         public DateTime LastRetryUtc { get; set; }
-        public ILifeCycleEvent Event { get; set; }
+        public ILifeCycleEvent Event { get; set; } = default!;
     }
 }

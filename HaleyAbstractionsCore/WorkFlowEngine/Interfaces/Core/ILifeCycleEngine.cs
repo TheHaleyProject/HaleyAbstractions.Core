@@ -7,6 +7,7 @@ using Haley.Models;
 namespace Haley.Abstractions {
     public interface ILifeCycleEngine {
         event Func<ILifeCycleEvent, Task>? EventRaised;
+        event Func<LifeCycleNotice, Task>? NoticeRaised;
         Task<LifeCycleTriggerResult> TriggerAsync(LifeCycleTriggerRequest req, CancellationToken ct = default);
         Task AckAsync(long consumerId, string ackGuid, AckOutcome outcome, string? message = null, DateTimeOffset? retryAt = null, CancellationToken ct = default);
         Task ClearCacheAsync(CancellationToken ct = default);
