@@ -25,8 +25,6 @@ namespace Haley.Abstractions {
         // policy attached to state/transition (your "policy json included on transition" concept)
         Task<DbRow?> GetPolicyForStateAsync(long definitionId, long stateId, DbExecutionLoad load = default);
     }
-
-    // IBlueprintWriteDAL.cs
     public interface IBlueprintWriteDAL {
         Task<int> EnsureEnvironmentByCodeAsync(int envCode, string envDisplayName, DbExecutionLoad load = default);
         Task<int> EnsureDefinitionByEnvIdAsync(int envId, string defDisplayName, string? description, DbExecutionLoad load = default);

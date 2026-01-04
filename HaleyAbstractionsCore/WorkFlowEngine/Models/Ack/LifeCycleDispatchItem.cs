@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Haley.Models {
     public sealed class LifeCycleDispatchItem : ILifeCycleDispatchItem {
-        public LifeCycleDispatchKind Kind { get; set; }
+        public LifeCycleEventKind Kind { get; set; }
         public long AckId { get; set; }
         public string AckGuid { get; set; } = string.Empty;
         public long ConsumerId { get; set; }

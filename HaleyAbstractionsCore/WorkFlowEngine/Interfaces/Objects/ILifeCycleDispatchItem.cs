@@ -6,7 +6,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface ILifeCycleDispatchItem {
-        LifeCycleDispatchKind Kind { get; }
+        LifeCycleEventKind Kind { get; }
         long AckId { get; }
         string AckGuid { get; }
         long ConsumerId { get; }
