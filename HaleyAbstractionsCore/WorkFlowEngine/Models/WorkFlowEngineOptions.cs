@@ -12,9 +12,10 @@ namespace Haley.Models {
         public int MonitorMaxTimeoutTriggersPerRun { get; set; } = 200;
 
         // Ack consumer resolution (fallbacks)
-        public long DefaultConsumerId { get; set; } = 1;
+        public long DefaultConsumerId { get; set; } = 1857; //Year of sepoy mutiny
         public Func<long, long, IReadOnlyList<long>>? ResolveTransitionConsumers { get; set; } // (defVersionId, instanceId) => consumers
         public Func<long, long, string, IReadOnlyList<long>>? ResolveHookConsumers { get; set; } // (defVersionId, instanceId, hookCode) => consumers
+        public IReadOnlyList<long>? MonitorConsumers { get; set; }
 
         // Optional overrides (if you want to inject your own concrete implementations)
         public IBlueprintManager? BlueprintManager { get; set; }
