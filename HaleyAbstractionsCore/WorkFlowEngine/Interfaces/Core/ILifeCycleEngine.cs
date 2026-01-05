@@ -13,7 +13,7 @@ namespace Haley.Abstractions {
         Task ClearCacheAsync(CancellationToken ct = default);
         Task InvalidateAsync(int envCode, string defName, CancellationToken ct = default);
         Task InvalidateAsync(long defVersionId, CancellationToken ct = default);
-
+        Task<string?> GetTimelineJsonAsync(long instanceId, CancellationToken ct = default);
         Task RunMonitorOnceAsync(CancellationToken ct = default);
     }
 }
