@@ -7,7 +7,6 @@ using Haley.Models;
 namespace Haley.Abstractions {
     public interface ILifeCycleHookEvent : ILifeCycleEvent {
         long HookId { get; }
-        long StateId { get; }
         bool OnEntry { get; }
         string HookCode { get; }
         string? OnSuccessEvent { get; }

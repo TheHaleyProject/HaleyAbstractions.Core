@@ -9,12 +9,9 @@ namespace Haley.Abstractions {
         long LifeCycleId { get; }
         long FromStateId { get; }
         long ToStateId { get; }
-        long EventId { get; }
         int EventCode { get; }
         string EventName { get; }
         IReadOnlyDictionary<string, object?>? PrevStateMeta { get; }
-        long? PolicyId { get; }
-        string? PolicyHash { get; }
         string? PolicyJson { get; }
     }
 }

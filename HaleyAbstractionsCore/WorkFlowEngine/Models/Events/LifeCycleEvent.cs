@@ -7,16 +7,16 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Haley.Models {
-    public abstract class LifeCycleEvent : ILifeCycleEvent {
-        public abstract LifeCycleEventKind Kind { get; }
-
+    public class LifeCycleEvent : ILifeCycleEvent {
+        public LifeCycleEventKind Kind { get; }
         public long ConsumerId { get; set; }
-        public long InstanceId { get; set; }
+        //public long InstanceId { get; set; } 
+        public string InstanceGuid { get; set; }
         public long DefinitionVersionId { get; set; }
         public string ExternalRef { get; set; }
+        public string AckGuid { get; set; }
         public string? RequestId { get; set; }
         public DateTimeOffset OccurredAt { get; set; }
-        public string AckGuid { get; set; }
         public bool AckRequired { get; set; }
         public IReadOnlyDictionary<string, object?>? Payload { get; set; }
     }
