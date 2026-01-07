@@ -16,19 +16,7 @@ namespace Haley.Models {
         public string EventName { get; set; }
         public IReadOnlyDictionary<string, object> PrevStateMeta { get; set; }
         public string PolicyJson { get; set; }
-        public static LifeCycleTransitionEvent Make(LifeCycleEvent evt) {
-            if (evt is null) new LifeCycleTransitionEvent();
-            return new LifeCycleTransitionEvent {
-                ConsumerId = evt.ConsumerId,
-                InstanceGuid = evt.InstanceGuid,
-                DefinitionVersionId = evt.DefinitionVersionId,
-                ExternalRef = evt.ExternalRef,
-                AckGuid = evt.AckGuid,
-                RequestId = evt.RequestId,
-                OccurredAt = evt.OccurredAt,
-                AckRequired = evt.AckRequired,
-                Payload = evt.Payload
-            };
-        }
+        public LifeCycleTransitionEvent() : base() { }
+        public LifeCycleTransitionEvent(LifeCycleEvent evt) : base(evt) { }
     }
 }

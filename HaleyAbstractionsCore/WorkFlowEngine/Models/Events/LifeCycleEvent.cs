@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Haley.Models {
     public class LifeCycleEvent : ILifeCycleEvent {
-        public LifeCycleEventKind Kind { get; }
+        public virtual LifeCycleEventKind Kind { get; }
         public long ConsumerId { get; set; }
         //public long InstanceId { get; set; } 
         public string InstanceGuid { get; set; }
@@ -19,5 +19,18 @@ namespace Haley.Models {
         public DateTimeOffset OccurredAt { get; set; }
         public bool AckRequired { get; set; }
         public IReadOnlyDictionary<string, object?>? Payload { get; set; }
+        public LifeCycleEvent() { }
+        public LifeCycleEvent(LifeCycleEvent source) {
+            Kind = source.Kind;
+            ConsumerId = source.ConsumerId;
+            InstanceGuid = source.InstanceGuid;
+            DefinitionVersionId = source.DefinitionVersionId;
+            ExternalRef = source.ExternalRef;
+            AckGuid = source.AckGuid;
+            RequestId = source.RequestId;
+            Payload = source.Payload;
+            OccurredAt = source.OccurredAt;
+            AckRequired = source.AckRequired;
+        }
     }
 }
