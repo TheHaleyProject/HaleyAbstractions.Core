@@ -13,8 +13,9 @@ namespace Haley.Models {
         public string AckGuid { get; set; } = string.Empty;
         public long ConsumerId { get; set; }
         public int AckStatus { get; set; }
-        public int RetryCount { get; set; }
-        public DateTime LastRetryUtc { get; set; }
+        public int TriggerCount { get; set; }
+        public DateTime LastTrigger { get; set; }
+        public DateTime? NextDue { get; set; }
         public ILifeCycleEvent Event { get; set; } = default!;
     }
 }

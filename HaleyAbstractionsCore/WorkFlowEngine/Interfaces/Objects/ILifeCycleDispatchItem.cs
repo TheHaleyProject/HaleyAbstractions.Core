@@ -11,8 +11,9 @@ namespace Haley.Abstractions {
         string AckGuid { get; }
         long ConsumerId { get; }
         int AckStatus { get; }
-        int RetryCount { get; }
-        DateTime LastRetryUtc { get; }
+        int TriggerCount { get; }
+        DateTime LastTrigger { get; }
+        DateTime? NextDue { get; }
         ILifeCycleEvent Event { get; }
     }
 }
