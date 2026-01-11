@@ -6,16 +6,13 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface IWorkFlowEngine : ILifeCycleEngine, IAsyncDisposable {
-        IStateMachine StateMachine { get; }
-        IBlueprintManager BlueprintManager { get; }
-        IBlueprintImporter BlueprintImporter { get; }
-        IPolicyEnforcer PolicyEnforcer { get; }
-        IAckManager AckManager { get; }
-        IRuntimeEngine Runtime { get; }
-        ILifeCycleMonitor Monitor { get; }
-        IWorkFlowDAL Dal { get; }
-
-        Task StartMonitorAsync(CancellationToken ct = default);
-        Task StopMonitorAsync(CancellationToken ct = default);
+        //IStateMachine StateMachine { get; }
+        //IBlueprintManager BlueprintManager { get; }
+        //IBlueprintImporter BlueprintImporter { get; }
+        //IPolicyEnforcer PolicyEnforcer { get; }
+        //IAckManager AckManager { get; }
+        //IRuntimeEngine Runtime { get; }
+        //ILifeCycleMonitor Monitor { get; }
+        //IWorkFlowDAL Dal { get; }
     }
 }

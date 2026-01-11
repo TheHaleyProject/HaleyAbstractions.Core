@@ -11,6 +11,7 @@ namespace Haley.Models {
         public int MonitorPageSize { get; set; } = 200;
         public TimeSpan AckPendingResendAfter { get; set; }= TimeSpan.FromSeconds(50);
         public TimeSpan AckDeliveredResendAfter { get; set; } = TimeSpan.FromMinutes(6);
+        public int MaxRetryCount { get; set; } = 10; //Beyond which, the acknowledgement will be marked as failed and associated instance will be marked as suspended. //Here, application might be down (crashed) and the acknowledgement was not notified.. 
 
         // Ack consumer resolution (fallbacks)
         public long DefaultConsumerId { get; set; } = 1857; //Year of sepoy mutiny
