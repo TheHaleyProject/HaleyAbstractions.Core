@@ -41,4 +41,10 @@ namespace Haley.Abstractions {
         Task<int> UpsertAsync(long lifeCycleId, string? actor, string? payloadJson, DbExecutionLoad load = default);
         Task<int> DeleteAsync(long lifeCycleId, DbExecutionLoad load = default);
     }
+
+    public interface ILifeCycleTimeoutDAL {
+        Task<DbRows> ListDuePagedAsync(uint excludedInstanceFlagsMask, int skip, int take, DbExecutionLoad load = default);
+        Task<int> InsertIgnoreAsync(long entryLcId, DbExecutionLoad load = default);
+    }
+
 }
