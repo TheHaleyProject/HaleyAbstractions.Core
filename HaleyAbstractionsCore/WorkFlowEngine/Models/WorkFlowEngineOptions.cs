@@ -9,7 +9,8 @@ namespace Haley.Models {
     public sealed class WorkFlowEngineOptions {
         public TimeSpan MonitorInterval { get; set; } = TimeSpan.FromMinutes(2);
         public int MonitorPageSize { get; set; } = 200;
-        public int MonitorMaxTimeoutTriggersPerRun { get; set; } = 200;
+        public TimeSpan AckPendingResendAfter { get; set; }= TimeSpan.FromSeconds(50);
+        public TimeSpan AckDeliveredResendAfter { get; set; } = TimeSpan.FromMinutes(6);
 
         // Ack consumer resolution (fallbacks)
         public long DefaultConsumerId { get; set; } = 1857; //Year of sepoy mutiny

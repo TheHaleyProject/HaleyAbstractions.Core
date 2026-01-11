@@ -14,6 +14,4 @@ namespace Haley.Abstractions {
         DateTimeOffset? NotBefore { get; }
         DateTimeOffset? Deadline { get; }
     }
-
-
 }
