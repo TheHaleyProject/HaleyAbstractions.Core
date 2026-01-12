@@ -10,6 +10,9 @@ namespace Haley.Abstractions {
         event Func<LifeCycleNotice, Task>? NoticeRaised;
         Task<LifeCycleTriggerResult> TriggerAsync(LifeCycleTriggerRequest req, CancellationToken ct = default);
         Task AckAsync(long consumerId, string ackGuid, AckOutcome outcome, string? message = null, DateTimeOffset? retryAt = null, CancellationToken ct = default);
+        Task AckAsync(int envCode, string consumerGuid, string ackGuid, AckOutcome outcome, string? message = null, DateTimeOffset? retryAt = null, CancellationToken ct = default);
+        Task<int> RegisterConsumerAsync(int envCode, string consumerGuid, CancellationToken ct = default);
+        Task BeatConsumerAsync(int envCode, string consumerGuid, CancellationToken ct = default);
         Task ClearCacheAsync(CancellationToken ct = default);
         Task InvalidateAsync(int envCode, string defName, CancellationToken ct = default);
         Task InvalidateAsync(long defVersionId, CancellationToken ct = default);
