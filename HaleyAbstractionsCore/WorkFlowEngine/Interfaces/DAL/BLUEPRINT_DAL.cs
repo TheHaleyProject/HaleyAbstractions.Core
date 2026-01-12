@@ -37,5 +37,14 @@ namespace Haley.Abstractions {
         Task<long> EnsurePolicyByHashAsync(string hash, string content, DbExecutionLoad load = default);
         Task<int> AttachPolicyToDefinitionByEnvCodeAndDefNameAsync(int envCode, string defName, long policyId, DbExecutionLoad load = default);
     }
-
+    public interface IConsumerDAL {
+        Task<int?> GetIdByEnvIdAndGuidAsync(int envId, string consumerGuid, DbExecutionLoad load = default);
+        Task<int?> GetIdAliveByEnvIdAndGuidAsync(int envId, string consumerGuid, int ttlSeconds, DbExecutionLoad load = default);
+        Task<int> UpsertBeatByEnvIdAndGuidAsync(int envId, string consumerGuid, DbExecutionLoad load = default);
+        Task<int> UpdateBeatByIdAsync(int consumerId, DbExecutionLoad load = default);
+        Task<IReadOnlyList<int>> ListAliveIdsByEnvIdAsync(int envId, int ttlSeconds, DbExecutionLoad load = default);
+        Task<int> IsAliveByIdAsync(int consumerId, int ttlSeconds, DbExecutionLoad load = default);
+        Task<int> IsAliveByEnvIdAndGuidAsync(int envId, string consumerGuid, int ttlSeconds, DbExecutionLoad load = default);
+        Task<DateTime?> GetLastBeatByEnvIdAndGuidAsync(int envId, string consumerGuid, DbExecutionLoad load = default);
+    }
 }
