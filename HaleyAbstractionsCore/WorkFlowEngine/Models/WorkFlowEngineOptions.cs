@@ -14,7 +14,6 @@ namespace Haley.Models {
         public int MaxRetryCount { get; set; } = 10; //Beyond which, the acknowledgement will be marked as failed and associated instance will be marked as suspended. //Here, application might be down (crashed) and the acknowledgement was not notified.. 
 
         // Ack consumer resolution (fallbacks)
-        public long DefaultConsumerId { get; set; } = 1857; //Year of sepoy mutiny
         public Func<long, long, IReadOnlyList<long>>? ResolveTransitionConsumers { get; set; } // (defVersionId, instanceId) => consumers
         public Func<long, long, string, IReadOnlyList<long>>? ResolveHookConsumers { get; set; } // (defVersionId, instanceId, hookCode) => consumers
         public IReadOnlyList<long>? MonitorConsumers { get; set; }
