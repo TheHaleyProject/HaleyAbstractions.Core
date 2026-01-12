@@ -13,8 +13,8 @@ namespace Haley.Abstractions {
         Task AckAsync(long consumerId, string ackGuid, AckOutcome outcome, string? message = null, DateTimeOffset? retryAt = null, DbExecutionLoad load = default);
         Task MarkRetryAsync(long ackId, long consumerId, DateTimeOffset? retryAt = null, DbExecutionLoad load = default);
         Task SetStatusAsync(long ackId, long consumerId, int ackStatus, DbExecutionLoad load = default);
-        Task<IReadOnlyList<ILifeCycleDispatchItem>> ListDueLifecycleDispatchAsync(long consumerId, int ackStatus, int skip, int take, DbExecutionLoad load = default);
-        Task<IReadOnlyList<ILifeCycleDispatchItem>> ListDueHookDispatchAsync(long consumerId, int ackStatus, int skip, int take, DbExecutionLoad load = default);
+        Task<IReadOnlyList<ILifeCycleDispatchItem>> ListDueLifecycleDispatchAsync(long consumerId, int ackStatus, int ttlSeconds, int skip, int take, DbExecutionLoad load = default);
+        Task<IReadOnlyList<ILifeCycleDispatchItem>> ListDueHookDispatchAsync(long consumerId, int ackStatus, int ttlSeconds, int skip, int take, DbExecutionLoad load = default);
         Task<int> CountDueLifecycleDispatchAsync(int ackStatus, DbExecutionLoad load = default);
         Task<int> CountDueHookDispatchAsync(int ackStatus, DbExecutionLoad load = default);
     }

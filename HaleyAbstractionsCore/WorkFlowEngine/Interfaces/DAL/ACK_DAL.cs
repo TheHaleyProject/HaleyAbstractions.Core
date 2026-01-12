@@ -27,8 +27,8 @@ namespace Haley.Abstractions {
     }
 
     public interface IAckDispatchDAL {
-        Task<DbRows> ListDueLifecyclePagedAsync(long consumer, int status, int skip, int take, DbExecutionLoad load = default);
-        Task<DbRows> ListDueHookPagedAsync(long consumer, int status, int skip, int take, DbExecutionLoad load = default);
+        Task<DbRows> ListDueLifecyclePagedAsync(long consumer, int status, int ttlSeconds, int skip, int take, DbExecutionLoad load = default);
+        Task<DbRows> ListDueHookPagedAsync(long consumer, int status, int ttlSeconds, int skip, int take, DbExecutionLoad load = default);
         Task<int?> CountDueLifecycleAsync(int status, DbExecutionLoad load = default);
         Task<int?> CountDueHookAsync(int status, DbExecutionLoad load = default);
     }
