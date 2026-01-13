@@ -15,7 +15,6 @@ namespace Haley.Abstractions {
         void Invalidate(long defVersionId);
         Task<long> EnsureConsumerIdAsync(int envCode, string consumerGuid, CancellationToken ct = default);
         Task<long> ResolveConsumerIdAsync(int envCode, string? consumerGuid, CancellationToken ct = default);
-        Task<long> EnsureDefaultConsumerIdAsync(int envCode, CancellationToken ct = default);
         Task BeatConsumerAsync(int envCode, string consumerGuid, CancellationToken ct = default);
     }
 }
