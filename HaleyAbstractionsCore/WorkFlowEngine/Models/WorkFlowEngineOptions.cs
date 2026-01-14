@@ -1,4 +1,5 @@
 ﻿using Haley.Abstractions;
+using Haley.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,9 +17,7 @@ namespace Haley.Models {
         public int ConsumerDownRecheckSeconds { get; set; } = 60;
 
         // Ack consumer resolution (fallbacks)
-        public Func<long, long, IReadOnlyList<long>>? ResolveTransitionConsumers { get; set; } // (defVersionId, instanceId) => consumers
-        public Func<long, long, string, IReadOnlyList<long>>? ResolveHookConsumers { get; set; } // (defVersionId, instanceId, hookCode) => consumers
-        public IReadOnlyList<long>? MonitorConsumers { get; set; }
+        public Func<LifeCycleConsumerType /* Consumer Type */, long? /*Definition Id*/, CancellationToken, Task<IReadOnlyList<long>>>? ResolveConsumers { get; set; } 
 
         // Optional overrides (if you want to inject your own concrete implementations)
         public IBlueprintManager? BlueprintManager { get; set; }
