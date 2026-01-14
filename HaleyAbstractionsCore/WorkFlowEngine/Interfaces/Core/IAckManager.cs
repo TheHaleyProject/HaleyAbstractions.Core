@@ -8,8 +8,8 @@ namespace Haley.Abstractions {
     public interface IAckManager {
         Task<IReadOnlyList<long>> GetTransitionConsumersAsync(long defVersionId, CancellationToken ct = default);
         Task<IReadOnlyList<long>> GetHookConsumersAsync(long defVersionId, CancellationToken ct = default);
-        Task<ILifeCycleAckRef> CreateLifecycleAckAsync(long lifecycleId, IReadOnlyList<long> consumerIds, int initialAckStatus, DbExecutionLoad load = default);
-        Task<ILifeCycleAckRef> CreateHookAckAsync(long hookId, IReadOnlyList<long> consumerIds, int initialAckStatus, DbExecutionLoad load = default);
+        Task<IWorkFlowAckRef> CreateLifecycleAckAsync(long lifecycleId, IReadOnlyList<long> consumerIds, int initialAckStatus, DbExecutionLoad load = default);
+        Task<IWorkFlowAckRef> CreateHookAckAsync(long hookId, IReadOnlyList<long> consumerIds, int initialAckStatus, DbExecutionLoad load = default);
         Task AckAsync(long consumerId, string ackGuid, AckOutcome outcome, string? message = null, DateTimeOffset? retryAt = null, DbExecutionLoad load = default);
         Task MarkRetryAsync(long ackId, long consumerId, DateTimeOffset? retryAt = null, DbExecutionLoad load = default);
         Task SetStatusAsync(long ackId, long consumerId, int ackStatus, DbExecutionLoad load = default);

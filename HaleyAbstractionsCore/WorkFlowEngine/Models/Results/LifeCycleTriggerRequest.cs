@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Haley.Models {
     public sealed class LifeCycleTriggerRequest {
-        public string? ConsumerGuid { get; set; }   
         public int EnvCode { get; set; }
         public string DefName { get; set; }
         public string ExternalRef { get; set; }

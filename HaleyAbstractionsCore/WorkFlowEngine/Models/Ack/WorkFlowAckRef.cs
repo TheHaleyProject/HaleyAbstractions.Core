@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Haley.Models {
-    public sealed class LifeCycleAckRef : ILifeCycleAckRef {
+    public sealed class WorkFlowAckRef : IWorkFlowAckRef {
         public long AckId { get; set; }
         public string AckGuid { get; set; }
     }

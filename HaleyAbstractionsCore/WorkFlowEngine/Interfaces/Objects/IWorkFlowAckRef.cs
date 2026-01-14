@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface ILifeCycleAckRef {
+    public interface IWorkFlowAckRef {
         long AckId { get; }
         string AckGuid { get; }
     }
