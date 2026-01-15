@@ -3,16 +3,12 @@
   <PropertyGroup>
 	  <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
 	  <SignAssembly>true</SignAssembly>
 	  <AssemblyOriginatorKeyFile>..\..\HaleyProject\HaleyProject.snk</AssemblyOriginatorKeyFile>
 	  <AssemblyName>Haley.Abstractions.Core</AssemblyName>
 	  <PackageId>Haley.Abstractions.Core</PackageId>
 	  <RootNamespace>Haley</RootNamespace>
 	  <Description>Abstractions needed for dot net 8 and above.</Description>
-	  <Company>TheHaleyProject</Company>
-	  <Authors>TheHaleyProject</Authors>
-	  <Copyright>Haley 2020</Copyright>
 	  <PackageIcon>Haley.png</PackageIcon>
 	  <AssemblyVersion>1.0.0.0</AssemblyVersion>
 	  <FileVersion>1.0.0.0</FileVersion>
