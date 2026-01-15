@@ -20,5 +20,9 @@ namespace Haley.Abstractions {
         Task RunMonitorOnceAsync(long consumerId, CancellationToken ct = default);
         Task StartMonitorAsync(CancellationToken ct = default);
         Task StopMonitorAsync(CancellationToken ct = default);
+        public Task<long> UpsertRuntimeAsync(RuntimeLogByNameRequest req, CancellationToken ct = default);
+        public Task<int> SetRuntimeStatusAsync(long runtimeId, string status, CancellationToken ct = default);
+        public Task<int> FreezeRuntimeAsync(long runtimeId, CancellationToken ct = default);
+        public Task<int> UnfreezeRuntimeAsync(long runtimeId, CancellationToken ct = default);
     }
 }
