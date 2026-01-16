@@ -32,10 +32,13 @@ namespace Haley.Abstractions {
         Task<long> InsertDefVersionAsync(int definitionId, int version, string data, string hash, DbExecutionLoad load = default);
         Task<int> EnsureCategoryByNameAsync(string displayName, DbExecutionLoad load = default);
         Task<int> InsertEventAsync(long defVersionId, string displayName, int code, DbExecutionLoad load = default);
-        Task<int> InsertStateAsync(long defVersionId, int categoryId, string displayName, uint flags, int? timeoutMinutes, uint timeoutMode, long? timeoutEventId, DbExecutionLoad load = default);
+        Task<int> InsertStateAsync(long defVersionId, int categoryId, string displayName, uint flags, DbExecutionLoad load = default);
         Task<int> InsertTransitionAsync(long defVersionId, int fromStateId, int toStateId, int eventId, DbExecutionLoad load = default);
         Task<long> EnsurePolicyByHashAsync(string hash, string content, DbExecutionLoad load = default);
         Task<int> AttachPolicyToDefinitionByEnvCodeAndDefNameAsync(int envCode, string defName, long policyId, DbExecutionLoad load = default);
+        Task<int> DeleteByPolicyIdAsync(long policyId, DbExecutionLoad load = default);
+        Task<int> InsertAsync(long policyId, string stateName, int duration, int mode, int? eventCode, DbExecutionLoad load = default);
+        Task<DbRows> ListByPolicyIdAsync(long policyId, DbExecutionLoad load = default);
     }
     public interface IConsumerDAL {
         Task<int?> GetIdByEnvIdAndGuidAsync(int envId, string consumerGuid, DbExecutionLoad load = default);

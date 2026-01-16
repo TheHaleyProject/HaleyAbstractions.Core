@@ -11,8 +11,6 @@ namespace Haley.Models {
         public string Name { get; set; }
         public string DisplayName { get; set; }
         public uint Flags { get; set; }
-        public int? TimeoutMinutes { get; set; }
-        public long? TimeoutEventId { get; set; }
         public bool IsInitial { get; set; }
         public StateDef() { }
     }
