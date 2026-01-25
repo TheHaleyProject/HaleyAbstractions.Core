@@ -12,6 +12,7 @@ namespace Haley.Models {
         public int MonitorPageSize { get; set; } = 200;
         public TimeSpan AckPendingResendAfter { get; set; }= TimeSpan.FromSeconds(50);
         public TimeSpan AckDeliveredResendAfter { get; set; } = TimeSpan.FromMinutes(6);
+        public TimeSpan DefaultStateStaleDuration { get; set; } = TimeSpan.FromMinutes(5);
         public int MaxRetryCount { get; set; } = 10; //Beyond which, the acknowledgement will be marked as failed and associated instance will be marked as suspended. //Here, application might be down (crashed) and the acknowledgement was not notified.. 
         public int ConsumerTtlSeconds { get; set; } = 120; //Consume should send heartbeats within this time window to be considered alive.
         public int ConsumerDownRecheckSeconds { get; set; } = 60;

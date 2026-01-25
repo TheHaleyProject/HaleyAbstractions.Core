@@ -25,7 +25,8 @@ namespace Haley.Abstractions {
         Task<int> CompleteWithMessageAsync(long instanceId, uint flags, string? message, DbExecutionLoad load = default);
         Task<int> ArchiveWithMessageAsync(long instanceId, uint flags, string? message, DbExecutionLoad load = default);
         Task<int> UnsetFlagsAsync(long instanceId, uint flags, DbExecutionLoad load = default); // (flags & ~FLAGS) query
-}
+        Task<DbRows> ListStaleByDefaultStateDurationPagedAsync(int staleSeconds, int processedAckStatus, uint excludedInstanceFlagsMask, int skip, int take, DbExecutionLoad load = default);
+    }
 
     public interface IHookDAL {
         Task<DbRow?> GetByIdAsync(long hookId, DbExecutionLoad load = default);
