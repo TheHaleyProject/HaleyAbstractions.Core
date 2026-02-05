@@ -14,6 +14,9 @@ namespace Haley.Abstractions {
         string AckGuid { get; }
         DateTimeOffset OccurredAt { get; }
         bool AckRequired { get; }
+        string? OnSuccessEvent { get; } //For both transition and hook events.
+        string? OnFailureEvent { get; }
         IReadOnlyDictionary<string, object?>? Payload { get; }
+        IReadOnlyList<LifeCycleParamItem>? Params { get; } 
     }
 }

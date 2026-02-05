@@ -10,5 +10,7 @@ namespace Haley.Abstractions {
         Task<IReadOnlyList<ILifeCycleHookEmission>> EmitHooksAsync(LifeCycleBlueprint bp, DbRow instance, ApplyTransitionResult applied, DbExecutionLoad load = default);
         Task<PolicyResolution> ResolvePolicyAsync(long definitionId, DbExecutionLoad load = default);
         Task<PolicyResolution> ResolvePolicyByIdAsync(long policyId, DbExecutionLoad load = default);
+        RuleContext ResolveRuleContextFromJson(string policyJson, StateDef toState, EventDef? viaEvent, CancellationToken ct = default);
+        HookContext ResolveHookContextFromJson(string policyJson, StateDef toState, EventDef? viaEvent, string hookCode, CancellationToken ct = default);
     }
 }

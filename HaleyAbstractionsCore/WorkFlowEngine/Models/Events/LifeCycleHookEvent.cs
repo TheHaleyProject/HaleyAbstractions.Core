@@ -12,8 +12,6 @@ namespace Haley.Models {
         public long HookId { get; set; }
         public bool OnEntry { get; set; }
         public string HookCode { get; set; } //Route or identifier for the hook
-        public string OnSuccessEvent { get; set; }
-        public string OnFailureEvent { get; set; }
         public DateTimeOffset? NotBefore { get; set; }
         public DateTimeOffset? Deadline { get; set; }
         public LifeCycleHookEvent() { }

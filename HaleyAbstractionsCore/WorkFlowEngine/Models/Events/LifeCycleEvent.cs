@@ -17,8 +17,11 @@ namespace Haley.Models {
         public string AckGuid { get; set; }
         public string? RequestId { get; set; }
         public DateTimeOffset OccurredAt { get; set; }
+        public string? OnSuccessEvent { get; set; }
+        public string? OnFailureEvent { get; set; } 
         public bool AckRequired { get; set; }
         public IReadOnlyDictionary<string, object?>? Payload { get; set; }
+        public IReadOnlyList<LifeCycleParamItem>? Params { get; set; }
         public LifeCycleEvent() { }
         public LifeCycleEvent(LifeCycleEvent source) {
             Kind = source.Kind;
@@ -29,6 +32,9 @@ namespace Haley.Models {
             AckGuid = source.AckGuid;
             RequestId = source.RequestId;
             Payload = source.Payload;
+            Params = source.Params;
+            OnSuccessEvent = source.OnSuccessEvent; 
+            OnFailureEvent = source.OnFailureEvent;
             OccurredAt = source.OccurredAt;
             AckRequired = source.AckRequired;
         }

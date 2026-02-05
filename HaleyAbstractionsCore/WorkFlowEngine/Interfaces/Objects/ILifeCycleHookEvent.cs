@@ -9,8 +9,6 @@ namespace Haley.Abstractions {
         long HookId { get; }
         bool OnEntry { get; }
         string HookCode { get; }
-        string? OnSuccessEvent { get; }
-        string? OnFailureEvent { get; }
         DateTimeOffset? NotBefore { get; }
         DateTimeOffset? Deadline { get; }
     }
