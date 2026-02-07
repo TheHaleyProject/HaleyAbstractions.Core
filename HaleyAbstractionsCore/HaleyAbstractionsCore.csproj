@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\HaleyProject\HaleyVersion.Props" />
   <PropertyGroup>
-	  <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+	  <TargetFrameworks>net8.0</TargetFrameworks>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <SignAssembly>true</SignAssembly>
 	  <AssemblyOriginatorKeyFile>..\..\HaleyProject\HaleyProject.snk</AssemblyOriginatorKeyFile>
@@ -32,7 +32,12 @@
     <None Include="WorkFlowEngine\Models\Ack\WorkFlowAckRef.cs" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />
+	</ItemGroup>
+
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>portable</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
