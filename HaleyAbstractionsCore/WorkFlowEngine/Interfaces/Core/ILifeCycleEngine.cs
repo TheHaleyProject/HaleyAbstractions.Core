@@ -17,6 +17,7 @@ namespace Haley.Abstractions {
         Task InvalidateAsync(int envCode, string defName, CancellationToken ct = default);
         Task InvalidateAsync(long defVersionId, CancellationToken ct = default);
         Task<string?> GetTimelineJsonAsync(long instanceId, CancellationToken ct = default);
+        Task<IReadOnlyList<InstanceRefItem>> GetInstanceRefsAsync(int envCode, string defName, LifeCycleInstanceFlag flags, int skip, int take, CancellationToken ct = default);
         Task RunMonitorOnceAsync(long consumerId, CancellationToken ct = default);
         Task StartMonitorAsync(CancellationToken ct = default);
         Task StopMonitorAsync(CancellationToken ct = default);
