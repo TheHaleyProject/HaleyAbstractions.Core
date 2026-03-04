@@ -18,6 +18,7 @@ namespace Haley.Models {
         public LifeCycleInstanceFlag? Flag { get; set; } = null;
         public IReadOnlyDictionary<string, object> Payload { get; set; }
         public DateTimeOffset? OccurredAt { get; set; }
+        public bool SkipAckGate { get; set; } = false;
         public LifeCycleTriggerRequest() { }
     }
 }

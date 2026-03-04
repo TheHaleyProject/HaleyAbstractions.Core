@@ -44,5 +44,6 @@ namespace Haley.Abstractions {
         Task<long?> GetAckIdByLcIdAsync(long lcId, DbExecutionLoad load = default);
         Task<int> AttachAsync(long ackId, long lcId, DbExecutionLoad load = default);
         Task<int> DeleteByLcIdAsync(long lcId, DbExecutionLoad load = default);
+        Task<int> CountPendingForInstanceAsync(long instanceId, DbExecutionLoad load = default);
     }
 }

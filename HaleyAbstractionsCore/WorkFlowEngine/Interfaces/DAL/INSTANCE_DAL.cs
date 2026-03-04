@@ -28,6 +28,11 @@ namespace Haley.Abstractions {
         Task<DbRows> ListStaleByDefaultStateDurationPagedAsync(int staleSeconds, int processedAckStatus, uint excludedInstanceFlagsMask, int skip, int take, DbExecutionLoad load = default);
     }
 
+    public interface IHookRouteDAL {
+        Task<long?> GetIdByNameAsync(string name, DbExecutionLoad load = default);
+        Task<long> UpsertByNameReturnIdAsync(string name, DbExecutionLoad load = default);
+    }
+
     public interface IHookDAL {
         Task<DbRow?> GetByIdAsync(long hookId, DbExecutionLoad load = default);
         Task<DbRow?> GetByKeyAsync(long instanceId, long stateId, long viaEventId, bool onEntry, string route, DbExecutionLoad load = default);

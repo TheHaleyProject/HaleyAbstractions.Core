@@ -16,6 +16,10 @@ namespace Haley.Models {
         public int MaxRetryCount { get; set; } = 10; //Beyond which, the acknowledgement will be marked as failed and associated instance will be marked as suspended. //Here, application might be down (crashed) and the acknowledgement was not notified.. 
         public int ConsumerTtlSeconds { get; set; } = 120; //Consume should send heartbeats within this time window to be considered alive.
         public int ConsumerDownRecheckSeconds { get; set; } = 60;
+        // When true, TriggerAsync will return Applied=false (Reason="BlockedByPendingAck") if the last lifecycle
+        // entry for this instance still has unresolved ack_consumer rows (status Pending or Delivered).
+        // Per-request override: set LifeCycleTriggerRequest.SkipAckGate=true to bypass.
+        public bool AckGateEnabled { get; set; } = false;
 
         // Ack consumer resolution (fallbacks)
         public Func<LifeCycleConsumerType /* Consumer Type */, long? /*Definition Id*/, CancellationToken, Task<IReadOnlyList<long>>>? ResolveConsumers { get; set; } 
