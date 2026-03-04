@@ -17,6 +17,7 @@ namespace Haley.Models {
         public bool AckRequired { get; set; } = true;
         public LifeCycleInstanceFlag? Flag { get; set; } = null;
         public IReadOnlyDictionary<string, object> Payload { get; set; }
+        public DateTimeOffset? OccurredAt { get; set; }
         public LifeCycleTriggerRequest() { }
     }
 }
