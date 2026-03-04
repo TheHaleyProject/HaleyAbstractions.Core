@@ -1,4 +1,4 @@
-﻿using Haley.Models;
+using Haley.Models;
 using Haley.Abstractions;
 using Haley.Enums;
 using System;
@@ -10,15 +10,13 @@ namespace Haley.Models {
     public class LifeCycleEvent : ILifeCycleEvent {
         public virtual LifeCycleEventKind Kind { get; }
         public long ConsumerId { get; set; }
-        //public long InstanceId { get; set; } 
         public string InstanceGuid { get; set; }
         public long DefinitionVersionId { get; set; }
-        public string ExternalRef { get; set; }
+        public string EntityId { get; set; }
         public string AckGuid { get; set; }
-        public string? RequestId { get; set; }
         public DateTimeOffset OccurredAt { get; set; }
         public string? OnSuccessEvent { get; set; }
-        public string? OnFailureEvent { get; set; } 
+        public string? OnFailureEvent { get; set; }
         public bool AckRequired { get; set; }
         public IReadOnlyDictionary<string, object?>? Payload { get; set; }
         public IReadOnlyList<LifeCycleParamItem>? Params { get; set; }
@@ -28,12 +26,11 @@ namespace Haley.Models {
             ConsumerId = source.ConsumerId;
             InstanceGuid = source.InstanceGuid;
             DefinitionVersionId = source.DefinitionVersionId;
-            ExternalRef = source.ExternalRef;
+            EntityId = source.EntityId;
             AckGuid = source.AckGuid;
-            RequestId = source.RequestId;
             Payload = source.Payload;
             Params = source.Params;
-            OnSuccessEvent = source.OnSuccessEvent; 
+            OnSuccessEvent = source.OnSuccessEvent;
             OnFailureEvent = source.OnFailureEvent;
             OccurredAt = source.OccurredAt;
             AckRequired = source.AckRequired;

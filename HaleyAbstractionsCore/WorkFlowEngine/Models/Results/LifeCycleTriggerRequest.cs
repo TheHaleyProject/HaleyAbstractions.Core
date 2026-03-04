@@ -9,10 +9,9 @@ namespace Haley.Models {
     public sealed class LifeCycleTriggerRequest {
         public int EnvCode { get; set; }
         public string DefName { get; set; }
-        public string ExternalRef { get; set; }
+        public string EntityId { get; set; }
         public string Event { get; set; }
         public string Actor { get; set; }
-        public string RequestId { get; set; }
         public long? PolicyId { get; set; } //Optional.. User may decide to 
         public bool AckRequired { get; set; } = true;
         public LifeCycleInstanceFlag? Flag { get; set; } = null;

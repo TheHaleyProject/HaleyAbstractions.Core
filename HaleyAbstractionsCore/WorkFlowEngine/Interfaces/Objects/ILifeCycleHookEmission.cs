@@ -9,7 +9,7 @@ namespace Haley.Abstractions {
         long HookId { get; }
         long StateId { get; }
         bool OnEntry { get; }
-        string HookCode { get; }
+        string Route { get; }
         string? OnSuccessEvent { get; }
         string? OnFailureEvent { get; }
         DateTimeOffset? NotBefore { get; }
