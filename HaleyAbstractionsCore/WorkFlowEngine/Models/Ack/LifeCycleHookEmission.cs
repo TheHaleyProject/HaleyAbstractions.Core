@@ -18,5 +18,6 @@ namespace Haley.Models {
         public DateTimeOffset? Deadline { get; set; }
         public IReadOnlyDictionary<string, object> Payload { get; set; }
         public IReadOnlyList<LifeCycleParamItem>? Params { get; set; }
+        public bool IsBlocking { get; set; } = true;
     }
 }

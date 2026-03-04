@@ -16,5 +16,6 @@ namespace Haley.Abstractions {
         DateTimeOffset? Deadline { get; }
         IReadOnlyDictionary<string, object?>? Payload { get; } // ephemeral (NOT stored)
         IReadOnlyList<LifeCycleParamItem>? Params { get; }
+        bool IsBlocking { get; }
     }
 }

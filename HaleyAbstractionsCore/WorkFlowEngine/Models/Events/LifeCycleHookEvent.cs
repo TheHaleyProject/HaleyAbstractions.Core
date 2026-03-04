@@ -14,6 +14,7 @@ namespace Haley.Models {
         public string HookCode { get; set; } //Route or identifier for the hook
         public DateTimeOffset? NotBefore { get; set; }
         public DateTimeOffset? Deadline { get; set; }
+        public bool IsBlocking { get; set; } = true;
         public LifeCycleHookEvent() { }
         public LifeCycleHookEvent(LifeCycleEvent evt) :base(evt){
             
