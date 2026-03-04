@@ -9,6 +9,8 @@ namespace Haley.Abstractions {
         LifeCycleEventKind Kind { get; }
         long ConsumerId { get; }
         string InstanceGuid { get; }
+        long DefinitionId { get; }
+        long DefinitionVersionId { get; }
         string EntityId { get; }
         string AckGuid { get; }
         DateTimeOffset OccurredAt { get; }

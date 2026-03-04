@@ -15,7 +15,6 @@ namespace Haley.Models {
         public int EventCode { get; set; }
         public string EventName { get; set; }
         public IReadOnlyDictionary<string, object> PrevStateMeta { get; set; }
-        public string PolicyJson { get; set; }
         public LifeCycleTransitionEvent() : base() { }
         public LifeCycleTransitionEvent(LifeCycleEvent evt) : base(evt) { }
     }

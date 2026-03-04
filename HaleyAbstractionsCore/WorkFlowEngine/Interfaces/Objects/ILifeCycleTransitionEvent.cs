@@ -12,6 +12,5 @@ namespace Haley.Abstractions {
         int EventCode { get; }
         string EventName { get; }
         IReadOnlyDictionary<string, object?>? PrevStateMeta { get; }
-        string? PolicyJson { get; }
     }
 }

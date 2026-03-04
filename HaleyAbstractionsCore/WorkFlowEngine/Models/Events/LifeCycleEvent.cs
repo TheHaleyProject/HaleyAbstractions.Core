@@ -11,6 +11,7 @@ namespace Haley.Models {
         public virtual LifeCycleEventKind Kind { get; }
         public long ConsumerId { get; set; }
         public string InstanceGuid { get; set; }
+        public long DefinitionId { get; set; }
         public long DefinitionVersionId { get; set; }
         public string EntityId { get; set; }
         public string AckGuid { get; set; }
@@ -25,6 +26,7 @@ namespace Haley.Models {
             Kind = source.Kind;
             ConsumerId = source.ConsumerId;
             InstanceGuid = source.InstanceGuid;
+            DefinitionId = source.DefinitionId;
             DefinitionVersionId = source.DefinitionVersionId;
             EntityId = source.EntityId;
             AckGuid = source.AckGuid;
