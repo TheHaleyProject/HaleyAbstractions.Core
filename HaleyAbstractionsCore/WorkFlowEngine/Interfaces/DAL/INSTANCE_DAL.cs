@@ -33,10 +33,17 @@ namespace Haley.Abstractions {
         Task<long> UpsertByNameReturnIdAsync(string name, DbExecutionLoad load = default);
     }
 
+    public interface IHookGroupDAL {
+        Task<long?> GetIdByNameAsync(string name, DbExecutionLoad load = default);
+        Task<long> UpsertByNameReturnIdAsync(string name, DbExecutionLoad load = default);
+        Task<DbRow?> GetContextByAckGuidAsync(string ackGuid, DbExecutionLoad load = default);
+        Task<int> CountUnresolvedInGroupAsync(long instanceId, long stateId, long viaEventId, bool onEntry, long groupId, DbExecutionLoad load = default);
+    }
+
     public interface IHookDAL {
         Task<DbRow?> GetByIdAsync(long hookId, DbExecutionLoad load = default);
         Task<DbRow?> GetByKeyAsync(long instanceId, long stateId, long viaEventId, bool onEntry, string route, DbExecutionLoad load = default);
-        Task<long> UpsertByKeyReturnIdAsync(long instanceId, long stateId, long viaEventId, bool onEntry, string route, bool blocking, DbExecutionLoad load = default);
+        Task<long> UpsertByKeyReturnIdAsync(long instanceId, long stateId, long viaEventId, bool onEntry, string route, bool blocking, string? groupName = null, DbExecutionLoad load = default);
         Task<DbRows> ListByInstanceAsync(long instanceId, DbExecutionLoad load = default);
         Task<DbRows> ListByInstanceAndStateAsync(long instanceId, long stateId, DbExecutionLoad load = default);
         Task<int> DeleteAsync(long hookId, DbExecutionLoad load = default);

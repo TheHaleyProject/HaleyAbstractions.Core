@@ -15,6 +15,7 @@ namespace Haley.Models {
         public DateTimeOffset? NotBefore { get; set; }
         public DateTimeOffset? Deadline { get; set; }
         public bool IsBlocking { get; set; } = true;
+        public string? GroupName { get; set; }
         public LifeCycleHookEvent() { }
         public LifeCycleHookEvent(LifeCycleEvent evt) :base(evt){
             

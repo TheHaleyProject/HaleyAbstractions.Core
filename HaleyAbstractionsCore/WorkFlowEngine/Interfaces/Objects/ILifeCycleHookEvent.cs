@@ -12,5 +12,6 @@ namespace Haley.Abstractions {
         DateTimeOffset? NotBefore { get; }
         DateTimeOffset? Deadline { get; }
         bool IsBlocking { get; }
+        string? GroupName { get; }
     }
 }

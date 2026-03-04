@@ -12,6 +12,7 @@ namespace Haley.Abstractions {
         ILifeCycleDAL LifeCycle { get; }
         ILifeCycleDataDAL LifeCycleData { get; }
         IHookRouteDAL HookRoute { get; }
+        IHookGroupDAL HookGroup { get; }
         IHookDAL Hook { get; }
         IConsumerDAL Consumer { get; }
         IAckDAL Ack { get; }

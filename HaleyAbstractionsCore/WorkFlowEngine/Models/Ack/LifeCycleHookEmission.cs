@@ -19,5 +19,6 @@ namespace Haley.Models {
         public IReadOnlyDictionary<string, object> Payload { get; set; }
         public IReadOnlyList<LifeCycleParamItem>? Params { get; set; }
         public bool IsBlocking { get; set; } = true;
+        public string? GroupName { get; set; }
     }
 }
