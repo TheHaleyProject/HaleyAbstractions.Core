@@ -2,6 +2,7 @@
 using Haley.Enums;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,14 +23,8 @@ namespace Haley.Models {
         public bool AckGateEnabled { get; set; } = false;
 
         // Ack consumer resolution (fallbacks)
-        public Func<LifeCycleConsumerType /* Consumer Type */, long? /*Definition Id*/, CancellationToken, Task<IReadOnlyList<long>>>? ResolveConsumers { get; set; } 
+        public Func<LifeCycleConsumerType /* Consumer Type */, long? /*Definition Id*/, CancellationToken, Task<IReadOnlyList<long>>>? ResolveConsumers { get; set; }
 
-        // Optional overrides (if you want to inject your own concrete implementations)
-        public IBlueprintManager? BlueprintManager { get; set; }
-        public IBlueprintImporter? BlueprintImporter { get; set; }
-        public IStateMachine? StateMachine { get; set; }
-        public IPolicyEnforcer? PolicyEnforcer { get; set; }
-        public IAckManager? AckManager { get; set; }
-        public IRuntimeEngine? RuntimeEngine { get; set; }
+        //public TargetDB Dbtype { get; set; } = TargetDB.maria; //Let us start with Mariadb.. Currently we dont have implementation for any other database type.
     }
 }

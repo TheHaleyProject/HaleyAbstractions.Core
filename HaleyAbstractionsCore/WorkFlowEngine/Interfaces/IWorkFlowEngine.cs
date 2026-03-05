@@ -5,7 +5,7 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface IWorkFlowEngine : ILifeCycleEngine, IAsyncDisposable {
+    public interface IWorkFlowEngine : ILifeCycleEngine, IBlueprintImporter, IAsyncDisposable {
        
     }
 }

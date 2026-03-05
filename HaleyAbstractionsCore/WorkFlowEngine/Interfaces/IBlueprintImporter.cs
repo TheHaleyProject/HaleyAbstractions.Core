@@ -9,5 +9,4 @@ namespace Haley.Abstractions {
         Task<long> ImportDefinitionJsonAsync(int envCode, string envDisplayName, string definitionJson, CancellationToken ct = default);
         Task<long> ImportPolicyJsonAsync(int envCode, string envDisplayName, string policyJson, CancellationToken ct = default);
     }
-
 }
