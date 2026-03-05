@@ -6,7 +6,6 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     public interface ILifeCycleEngine {
-        IDALUtilBase Dal { get; }
         event Func<ILifeCycleEvent, Task>? EventRaised;
         event Func<LifeCycleNotice, Task>? NoticeRaised;
         Task<LifeCycleTriggerResult> TriggerAsync(LifeCycleTriggerRequest req, CancellationToken ct = default);
