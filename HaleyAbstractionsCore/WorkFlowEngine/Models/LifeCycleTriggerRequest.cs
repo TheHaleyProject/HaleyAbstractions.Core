@@ -15,6 +15,7 @@ namespace Haley.Models {
         public long? PolicyId { get; set; } //Optional.. User may decide to 
         public bool AckRequired { get; set; } = true;
         public LifeCycleInstanceFlag? Flag { get; set; } = null;
+        public string? Metadata { get; set; }
         public IReadOnlyDictionary<string, object> Payload { get; set; }
         public DateTimeOffset? OccurredAt { get; set; }
         public bool SkipAckGate { get; set; } = false;

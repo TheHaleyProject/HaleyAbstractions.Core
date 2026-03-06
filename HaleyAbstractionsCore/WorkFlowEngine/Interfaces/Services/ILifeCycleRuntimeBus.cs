@@ -7,6 +7,12 @@ using Haley.Models;
 namespace Haley.Abstractions {
     public interface ILifeCycleRuntimeBus {
         Task<LifeCycleTriggerResult> TriggerAsync(LifeCycleTriggerRequest req, CancellationToken ct = default);
+        Task<LifeCycleInstanceData?> GetInstanceDataAsync(string instanceGuid, CancellationToken ct = default);
+        Task<LifeCycleInstanceData?> GetInstanceDataAsync(string defName, string entityId, CancellationToken ct = default);
+        Task<string?> GetInstanceContextAsync(string instanceGuid, CancellationToken ct = default);
+        Task<string?> GetInstanceContextAsync(string defName, string entityId, CancellationToken ct = default);
+        Task<int> SetInstanceContextAsync(string instanceGuid, string? context, CancellationToken ct = default);
+        Task<int> SetInstanceContextAsync(string defName, string entityId, string? context, CancellationToken ct = default);
         Task ClearCacheAsync(CancellationToken ct = default);
         Task InvalidateAsync(int envCode, string defName, CancellationToken ct = default);
         Task InvalidateAsync(long defVersionId, CancellationToken ct = default);

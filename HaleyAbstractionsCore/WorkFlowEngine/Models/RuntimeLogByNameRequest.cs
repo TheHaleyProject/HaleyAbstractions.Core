@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 namespace Haley.Models {
     public sealed class RuntimeLogByNameRequest {
         public string InstanceGuid { get; set; } = "";
+        public string DefName { get; set; } = "";
+        public string EntityId { get; set; } = "";
         public long StateId { get; set; }
         public string Activity { get; set; } = "";     
         public string Status { get; set; } = "";      

@@ -17,7 +17,7 @@ namespace Haley.Abstractions {
         bool AckRequired { get; }
         string? OnSuccessEvent { get; } //For both transition and hook events.
         string? OnFailureEvent { get; }
-        IReadOnlyDictionary<string, object?>? Payload { get; }
+        string? Metadata { get; }
         IReadOnlyList<LifeCycleParamItem>? Params { get; } 
     }
 }
