@@ -12,5 +12,7 @@ namespace Haley.Abstractions {
         DateTimeOffset? Deadline { get; }
         bool IsBlocking { get; }
         string? GroupName { get; }
+        int OrderSeq { get; }   // emission order stage for this hook
+        int AckMode  { get; }   // 0=All; 1=Any
     }
 }
