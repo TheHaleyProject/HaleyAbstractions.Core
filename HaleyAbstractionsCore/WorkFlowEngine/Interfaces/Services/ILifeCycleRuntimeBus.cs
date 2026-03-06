@@ -5,26 +5,16 @@ using Haley.Enums;
 using Haley.Models;
 
 namespace Haley.Abstractions {
-    public interface ILifeCycleEngine {
-        event Func<ILifeCycleEvent, Task>? EventRaised;
-        event Func<LifeCycleNotice, Task>? NoticeRaised;
+    public interface ILifeCycleRuntimeBus {
         Task<LifeCycleTriggerResult> TriggerAsync(LifeCycleTriggerRequest req, CancellationToken ct = default);
-        Task AckAsync(long consumerId, string ackGuid, AckOutcome outcome, string? message = null, DateTimeOffset? retryAt = null, CancellationToken ct = default);
-        Task AckAsync(int envCode, string consumerGuid, string ackGuid, AckOutcome outcome, string? message = null, DateTimeOffset? retryAt = null, CancellationToken ct = default);
-        Task<long> RegisterConsumerAsync(int envCode, string consumerGuid, CancellationToken ct = default);
-        Task BeatConsumerAsync(int envCode, string consumerGuid, CancellationToken ct = default);
         Task ClearCacheAsync(CancellationToken ct = default);
         Task InvalidateAsync(int envCode, string defName, CancellationToken ct = default);
         Task InvalidateAsync(long defVersionId, CancellationToken ct = default);
         Task<string?> GetTimelineJsonAsync(long instanceId, CancellationToken ct = default);
         Task<IReadOnlyList<InstanceRefItem>> GetInstanceRefsAsync(int envCode, string defName, LifeCycleInstanceFlag flags, int skip, int take, CancellationToken ct = default);
-        Task RunMonitorOnceAsync(long consumerId, CancellationToken ct = default);
-        Task StartMonitorAsync(CancellationToken ct = default);
-        Task StopMonitorAsync(CancellationToken ct = default);
         public Task<long> UpsertRuntimeAsync(RuntimeLogByNameRequest req, CancellationToken ct = default);
         public Task<int> SetRuntimeStatusAsync(long runtimeId, string status, CancellationToken ct = default);
         public Task<int> FreezeRuntimeAsync(long runtimeId, CancellationToken ct = default);
         public Task<int> UnfreezeRuntimeAsync(long runtimeId, CancellationToken ct = default);
-        public Task<int> RegisterEnvironmentAsync(int envCode, string? envDisplayName, CancellationToken ct = default);
     }
 }
