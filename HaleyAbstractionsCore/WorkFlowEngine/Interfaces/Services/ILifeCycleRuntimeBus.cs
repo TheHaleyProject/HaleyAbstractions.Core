@@ -7,20 +7,17 @@ using Haley.Models;
 namespace Haley.Abstractions {
     public interface ILifeCycleRuntimeBus {
         Task<LifeCycleTriggerResult> TriggerAsync(LifeCycleTriggerRequest req, CancellationToken ct = default);
-        Task<LifeCycleInstanceData?> GetInstanceDataAsync(string instanceGuid, CancellationToken ct = default);
-        Task<LifeCycleInstanceData?> GetInstanceDataAsync(string defName, string entityId, CancellationToken ct = default);
-        Task<string?> GetInstanceContextAsync(string instanceGuid, CancellationToken ct = default);
-        Task<string?> GetInstanceContextAsync(string defName, string entityId, CancellationToken ct = default);
-        Task<int> SetInstanceContextAsync(string instanceGuid, string? context, CancellationToken ct = default);
-        Task<int> SetInstanceContextAsync(string defName, string entityId, string? context, CancellationToken ct = default);
+        Task<LifeCycleInstanceData?> GetInstanceDataAsync(LifeCycleInstanceKey key, CancellationToken ct = default);
+        Task<string?> GetInstanceContextAsync(LifeCycleInstanceKey key, CancellationToken ct = default);
+        Task<int> SetInstanceContextAsync(LifeCycleInstanceKey key, string? context, CancellationToken ct = default);
         Task ClearCacheAsync(CancellationToken ct = default);
         Task InvalidateAsync(int envCode, string defName, CancellationToken ct = default);
         Task InvalidateAsync(long defVersionId, CancellationToken ct = default);
-        Task<string?> GetTimelineJsonAsync(long instanceId, CancellationToken ct = default);
+        Task<string?> GetTimelineJsonAsync(LifeCycleInstanceKey key, CancellationToken ct = default);
         Task<IReadOnlyList<InstanceRefItem>> GetInstanceRefsAsync(int envCode, string defName, LifeCycleInstanceFlag flags, int skip, int take, CancellationToken ct = default);
-        public Task<long> UpsertRuntimeAsync(RuntimeLogByNameRequest req, CancellationToken ct = default);
-        public Task<int> SetRuntimeStatusAsync(long runtimeId, string status, CancellationToken ct = default);
-        public Task<int> FreezeRuntimeAsync(long runtimeId, CancellationToken ct = default);
-        public Task<int> UnfreezeRuntimeAsync(long runtimeId, CancellationToken ct = default);
+        Task<long> UpsertRuntimeAsync(RuntimeLogByNameRequest req, CancellationToken ct = default);
+        Task<int> SetRuntimeStatusAsync(LifeCycleRuntimeRef runtimeRef, string status, CancellationToken ct = default);
+        Task<int> FreezeRuntimeAsync(LifeCycleRuntimeRef runtimeRef, CancellationToken ct = default);
+        Task<int> UnfreezeRuntimeAsync(LifeCycleRuntimeRef runtimeRef, CancellationToken ct = default);
     }
 }

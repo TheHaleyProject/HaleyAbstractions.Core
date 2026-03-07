@@ -6,10 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Haley.Models {
-    public sealed class LifeCycleTriggerRequest {
-        public int EnvCode { get; set; }
-        public string DefName { get; set; }
-        public string EntityId { get; set; }
+    public sealed class LifeCycleTriggerRequest : LifeCycleInstanceKey {
         public string Event { get; set; }
         public string Actor { get; set; }
         public long? PolicyId { get; set; } //Optional.. User may decide to 
