@@ -19,5 +19,7 @@ namespace Haley.Abstractions {
         Task<int> SetRuntimeStatusAsync(LifeCycleRuntimeRef runtimeRef, string status, CancellationToken ct = default);
         Task<int> FreezeRuntimeAsync(LifeCycleRuntimeRef runtimeRef, CancellationToken ct = default);
         Task<int> UnfreezeRuntimeAsync(LifeCycleRuntimeRef runtimeRef, CancellationToken ct = default);
+        Task<DbRows> ListInstancesAsync(int envCode, string? defName, bool runningOnly, int skip, int take, CancellationToken ct = default);
+        Task<DbRows> ListPendingAcksAsync(int envCode, int skip, int take, CancellationToken ct = default);
     }
 }

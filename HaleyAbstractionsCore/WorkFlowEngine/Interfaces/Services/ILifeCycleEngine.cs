@@ -10,5 +10,6 @@ namespace Haley.Abstractions {
         Task StartMonitorAsync(CancellationToken ct = default);
         Task StopMonitorAsync(CancellationToken ct = default);
         Task<WorkFlowEngineHealth> GetHealthAsync(CancellationToken ct = default);
+        Task<WorkFlowEngineSummary> GetSummaryAsync(int envCode, CancellationToken ct = default);
     }
 }
