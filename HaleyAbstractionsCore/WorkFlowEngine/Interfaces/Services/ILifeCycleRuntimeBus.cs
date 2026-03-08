@@ -20,5 +20,9 @@ namespace Haley.Abstractions {
         Task<long> UpsertRuntimeAsync(RuntimeLogByNameRequest req, CancellationToken ct = default);
         Task<DbRows> ListInstancesAsync(int envCode, string? defName, bool runningOnly, int skip, int take, CancellationToken ct = default);
         Task<DbRows> ListPendingAcksAsync(int envCode, int skip, int take, CancellationToken ct = default);
+        // Resets a terminal (Completed/Failed/Archived) instance back to its initial state and immediately
+        // fires the auto-start event so it begins a fresh run. Useful for reopen and idempotency testing.
+        // Returns Applied=false with Reason="NotTerminal" if the instance is not in a terminal state.
+        Task<LifeCycleTriggerResult> ReopenAsync(string instanceGuid, string actor, CancellationToken ct = default);
     }
 }

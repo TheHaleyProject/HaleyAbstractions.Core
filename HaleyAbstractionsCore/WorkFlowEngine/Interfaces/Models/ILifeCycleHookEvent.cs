@@ -14,5 +14,10 @@ namespace Haley.Abstractions {
         string? GroupName { get; }
         int OrderSeq { get; }   // emission order stage for this hook
         int AckMode  { get; }   // 0=All; 1=Any
+        /// <summary>
+        /// How many times this hook has been fully dispatched to consumers, including this delivery.
+        /// 1 = first time, 2 = second run (e.g. after a ReopenAsync), etc.
+        /// </summary>
+        int RunCount { get; }
     }
 }

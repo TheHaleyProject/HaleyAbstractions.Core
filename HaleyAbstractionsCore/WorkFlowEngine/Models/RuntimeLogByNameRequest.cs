@@ -21,6 +21,14 @@ namespace Haley.Models {
         /// If omitted, state is derived from the instance's current state (safe for non-replay usage).
         /// </summary>
         public string? AckGuid { get; set; }
+        /// <summary>
+        /// When true, the activity is not tied to any state or lifecycle transition.
+        /// state_id and lc_id are stored as 0 — the entry always appears under "Other Activities"
+        /// in the timeline, regardless of which state the instance is currently in.
+        /// Use this for instance-level side-effects (audit logs, notifications, housekeeping)
+        /// that do not belong to a specific workflow state.
+        /// </summary>
+        public bool IsGeneral { get; set; }
         public object? Data { get; set; }
         public object? Payload { get; set; }
         public RuntimeLogByNameRequest() { }
