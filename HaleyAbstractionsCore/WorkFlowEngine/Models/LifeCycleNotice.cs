@@ -25,7 +25,7 @@ namespace Haley.Models {
             OccurredAt = DateTimeOffset.UtcNow;
         }
 
-        public static LifeCycleNotice Error(string noticeType, string code, string message, Exception ex, IReadOnlyDictionary<string, object?>? data = null) => new LifeCycleNotice(LifeCycleNoticeKind.Error, noticeType, code, message, ex, data);
+        public static LifeCycleNotice Error(string noticeType, string code, string message, Exception? ex =null, IReadOnlyDictionary<string, object?>? data = null) => new LifeCycleNotice(LifeCycleNoticeKind.Error, noticeType, code, message, ex, data);
         public static LifeCycleNotice Warn(string noticeType, string code, string message, IReadOnlyDictionary<string, object?>? data = null) => new LifeCycleNotice(LifeCycleNoticeKind.Warning, noticeType, code, message, null, data);
         public static LifeCycleNotice Info(string noticeType, string code, string message, IReadOnlyDictionary<string, object?>? data = null) => new LifeCycleNotice(LifeCycleNoticeKind.Info, noticeType, code, message, null, data);
     }
