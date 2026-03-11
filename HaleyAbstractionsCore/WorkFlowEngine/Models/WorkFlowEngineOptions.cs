@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Haley.Models {
+    //Dont mark as sealed.. this needs to be inherited by other classes.
     public class WorkFlowEngineOptions {
         [ConfigurationKeyName("monitor_interval")]
         public TimeSpan MonitorInterval { get; set; } = TimeSpan.FromMinutes(2);
