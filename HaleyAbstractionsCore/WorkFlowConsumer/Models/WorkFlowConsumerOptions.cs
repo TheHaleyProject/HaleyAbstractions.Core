@@ -2,7 +2,9 @@ using Haley.Enums;
 using Microsoft.Extensions.Configuration;
 
 namespace Haley.Services {
-    public sealed class ConsumerServiceOptions {
+
+    //Dont seal this..
+    public class WorkFlowConsumerOptions {
         /// <summary>Stable identity string for this consumer process. Used for engine registration and heartbeat.</summary>
         [ConfigurationKeyName("guid")]
         public string ConsumerGuid { get; set; } = string.Empty;
