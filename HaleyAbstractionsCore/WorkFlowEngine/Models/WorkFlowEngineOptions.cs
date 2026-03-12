@@ -33,9 +33,15 @@ namespace Haley.Models {
         [ConfigurationKeyName("ack_gate")]
         public bool AckGateEnabled { get; set; } = false;
 
-        // Ack consumer resolution (fallbacks)
-        public Func<LifeCycleConsumerType /* Consumer Type */, long? /*Definition Id*/, CancellationToken, Task<IReadOnlyList<long>>>? ResolveConsumers { get; set; }
+        // Preferred boundary contract:
+        // caller resolves consumer GUIDs by (consumerType, envCode, definitionName).
+        // Engine maps GUIDs to numeric consumer IDs internally.
+        public Func<LifeCycleConsumerType /* Consumer Type */, int /* Env Code */, string? /* Definition Name */, CancellationToken, Task<IReadOnlyList<string>>>? ResolveConsumerGuids { get; set; }
+
+        // Legacy contract (ID-based). Kept for backward compatibility.
+        public Func<LifeCycleConsumerType /* Consumer Type */, long? /*Definition Version Id*/, CancellationToken, Task<IReadOnlyList<long>>>? ResolveConsumers { get; set; }
 
         //public TargetDB Dbtype { get; set; } = TargetDB.maria; //Let us start with Mariadb.. Currently we dont have implementation for any other database type.
     }
 }
+
