@@ -17,6 +17,11 @@ namespace Haley.Abstractions {
         IWorkFlowConsumerProcessor RegisterAssembly(Assembly assembly);
         /// <summary>Loads the named assembly (if not already loaded) and scans it.</summary>
         IWorkFlowConsumerProcessor RegisterAssembly(string assemblyName);
+        Task<DbRows> ListWorkflowsAsync(int skip, int take, CancellationToken ct = default);
+        Task<DbRows> ListInboxAsync(int? status, int skip, int take, CancellationToken ct = default);
+        Task<DbRows> ListOutboxAsync(int? status, int skip, int take, CancellationToken ct = default);
+        Task<long> CountPendingInboxAsync(CancellationToken ct = default);
+        Task<long> CountPendingOutboxAsync(CancellationToken ct = default);
         Task StartAsync(CancellationToken ct = default);
         Task StopAsync(CancellationToken ct = default);
     }
