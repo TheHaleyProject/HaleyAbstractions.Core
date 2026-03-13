@@ -13,7 +13,7 @@ namespace Haley.Abstractions {
         Task ClearCacheAsync(CancellationToken ct = default);
         Task InvalidateAsync(int envCode, string defName, CancellationToken ct = default);
         Task InvalidateAsync(long defVersionId, CancellationToken ct = default);
-        Task<string?> GetTimelineJsonAsync(LifeCycleInstanceKey key, CancellationToken ct = default);
+        Task<string?> GetTimelineJsonAsync(LifeCycleInstanceKey key, TimelineDetail detail = TimelineDetail.Detailed, CancellationToken ct = default);
         Task<IReadOnlyList<InstanceRefItem>> GetInstanceRefsAsync(int envCode, string defName, LifeCycleInstanceFlag flags, int skip, int take, CancellationToken ct = default);
         // Call once to record the initial status ("running"), call again with the final status ("approved",
         // "rejected", etc.) — the upsert updates the existing row in-place. No separate SetStatus needed.
