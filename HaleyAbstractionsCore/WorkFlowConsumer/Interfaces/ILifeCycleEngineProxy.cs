@@ -13,7 +13,7 @@ namespace Haley.Abstractions {
         /// Fires for proxy-level failures and, when the underlying source supports it, relayed
         /// notices from that source (e.g. engine <see cref="IWorkFlowEngine.NoticeRaised"/> for
         /// <see cref="InProcessEngineProxy"/>). The consumer service subscribes to this and surfaces
-        /// the notices through its own <see cref="IWorkFlowConsumerProcessor.NoticeRaised"/>.
+        /// the notices through its own <see cref="IWorkFlowConsumerManager.NoticeRaised"/>.
         /// </summary>
         event Func<LifeCycleNotice, Task>? NoticeRaised;
 

@@ -3,7 +3,7 @@ using Haley.Models;
 
 namespace Haley.Abstractions {
     //Runtime processor
-    public interface IWorkFlowConsumerProcessor {
+    public interface IWorkFlowConsumerManager {
         /// <summary>
         /// Fires for every failure or notable event inside the consumer service — dispatch errors,
         /// outbox ACK failures, heartbeat errors, registry misses, etc.
@@ -14,9 +14,9 @@ namespace Haley.Abstractions {
 
         /// <summary>Scans <paramref name="assembly"/> for <see cref="LifeCycleWrapper"/> subclasses
         /// decorated with <see cref="LifeCycleDefinitionAttribute"/> and registers them.</summary>
-        IWorkFlowConsumerProcessor RegisterAssembly(Assembly assembly);
+        IWorkFlowConsumerManager RegisterAssembly(Assembly assembly);
         /// <summary>Loads the named assembly (if not already loaded) and scans it.</summary>
-        IWorkFlowConsumerProcessor RegisterAssembly(string assemblyName);
+        IWorkFlowConsumerManager RegisterAssembly(string assemblyName);
         Task<DbRows> ListWorkflowsAsync(int skip, int take, CancellationToken ct = default);
         Task<DbRows> ListInboxAsync(int? status, int skip, int take, CancellationToken ct = default);
         Task<DbRows> ListOutboxAsync(int? status, int skip, int take, CancellationToken ct = default);
