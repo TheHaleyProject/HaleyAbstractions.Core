@@ -1,18 +1,32 @@
 namespace Haley.Models {
 
     public sealed class ConsumerTimeline {
+        public long InstanceId { get; set; }
         public string InstanceGuid { get; set; } = string.Empty;
+        public string EntityGuid { get; set; } = string.Empty;
+        public string DefName { get; set; } = string.Empty;
+        public int DefVersion { get; set; }
+        /// <summary>Engine-side instance creation timestamp mirrored into the consumer timeline header.</summary>
+        public DateTime Created { get; set; }
+        public ConsumerTimelineInstance? Instance { get; set; }
         public IReadOnlyList<ConsumerTimelineItem> Items { get; set; } = Array.Empty<ConsumerTimelineItem>();
+    }
+
+    public sealed class ConsumerTimelineInstance {
+        public long Id { get; set; }
+        public string Guid { get; set; } = string.Empty;
+        public string EntityGuid { get; set; } = string.Empty;
+        public string DefName { get; set; } = string.Empty;
+        public int DefVersion { get; set; }
+        /// <summary>Engine-side instance creation timestamp mirrored into the consumer database.</summary>
+        public DateTime Created { get; set; }
     }
 
     public sealed class ConsumerTimelineItem {
         public long InboxId { get; set; }
         public string AckGuid { get; set; } = string.Empty;
-        public string EntityId { get; set; } = string.Empty;
         /// <summary>WorkflowKind name — "Transition" or "Hook".</summary>
         public string Kind { get; set; } = string.Empty;
-        public long DefId { get; set; }
-        public long DefVersionId { get; set; }
         public int? HandlerVersion { get; set; }
         public int? EventCode { get; set; }
         public string? Route { get; set; }
@@ -21,7 +35,7 @@ namespace Haley.Models {
         public DateTime Created { get; set; }
         public ConsumerTimelineStatus? InboxStatus { get; set; }
         public ConsumerTimelineOutbox? Outbox { get; set; }
-        public IReadOnlyList<ConsumerTimelineStep> Steps { get; set; } = Array.Empty<ConsumerTimelineStep>();
+        public IReadOnlyList<ConsumerTimelineAction> Actions { get; set; } = Array.Empty<ConsumerTimelineAction>();
     }
 
     public sealed class ConsumerTimelineStatus {
@@ -36,7 +50,7 @@ namespace Haley.Models {
     public sealed class ConsumerTimelineOutbox {
         /// <summary>AckOutcome name — "Processed", "Retry", "Failed".</summary>
         public string Outcome { get; set; } = string.Empty;
-        /// <summary>OutboxStatus name — "Pending", "Confirmed", "Dead".</summary>
+        /// <summary>OutboxStatus name — "Pending", "Sent", "Confirmed", "Failed".</summary>
         public string Status { get; set; } = string.Empty;
         public DateTimeOffset? NextRetryAt { get; set; }
         public string? LastError { get; set; }
@@ -55,13 +69,16 @@ namespace Haley.Models {
         public DateTime CreatedAt { get; set; }
     }
 
-    public sealed class ConsumerTimelineStep {
-        public int StepCode { get; set; }
-        /// <summary>InboxStepStatus name — "Running", "Completed", "Failed".</summary>
-        public string Status { get; set; } = string.Empty;
+    public sealed class ConsumerTimelineAction {
+        public long ActionId { get; set; }
+        public int ActionCode { get; set; }
+        /// <summary>Per-delivery status from inbox_action: "Attempted", "Completed", "Failed".</summary>
+        public string DeliveryStatus { get; set; } = string.Empty;
+        public string? DeliveryError { get; set; }
+        /// <summary>Instance-wide status from business_action: "Pending", "Running", "Completed", "Failed".</summary>
+        public string BusinessStatus { get; set; } = string.Empty;
         public DateTime? StartedAt { get; set; }
         public DateTime? CompletedAt { get; set; }
         public string? ResultJson { get; set; }
-        public string? LastError { get; set; }
     }
 }

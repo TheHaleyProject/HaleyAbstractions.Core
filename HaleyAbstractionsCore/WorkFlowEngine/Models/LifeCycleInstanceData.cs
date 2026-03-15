@@ -10,6 +10,7 @@ namespace Haley.Models {
         public string InstanceGuid { get; set; }
         public long DefinitionId { get; set; }
         public long DefinitionVersionId { get; set; }
+        public int DefinitionVersion { get; set; }
         public string? DefinitionName { get; set; }
         public string EntityId { get; set; }
         public long CurrentStateId { get; set; }
@@ -17,5 +18,6 @@ namespace Haley.Models {
         public string? InstanceStatus { get; set; }
         public string? Metadata { get; set; }
         public string? Context { get; set; }
+        public DateTime Created { get; set; }
     }
 }

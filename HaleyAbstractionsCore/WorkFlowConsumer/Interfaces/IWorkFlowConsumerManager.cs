@@ -31,7 +31,7 @@ namespace Haley.Abstractions {
         IWorkFlowConsumerManager RegisterAssembly(string assemblyName);
 
         // ── Administrative reads ──────────────────────────────────────────────
-        Task<DbRows> ListWorkflowsAsync(ConsumerWorkflowFilter filter, CancellationToken ct = default);
+        Task<DbRows> ListInstancesAsync(ConsumerInstanceFilter filter, CancellationToken ct = default);
         Task<DbRows> ListInboxAsync(ConsumerInboxFilter filter, CancellationToken ct = default);
         Task<DbRows> ListInboxStatusesAsync(ConsumerInboxStatusFilter filter, CancellationToken ct = default);
         Task<DbRows> ListOutboxAsync(ConsumerOutboxFilter filter, CancellationToken ct = default);
@@ -41,27 +41,21 @@ namespace Haley.Abstractions {
         /// <summary>
         /// Returns the full consumer-side history for a workflow instance:
         /// every inbox event (transitions + hooks) with its processing status, outbox ACK record,
-        /// outbox retry history, and handler step checkpoints — all correlated by instance_guid.
+        /// outbox retry history, and business action results — all correlated by instance_guid.
         /// </summary>
         Task<ConsumerTimeline> GetConsumerTimelineAsync(string instanceGuid, CancellationToken ct = default);
 
-        // ── Entity & Workflow management (client-facing) ──────────────────────
+        // ── Instance management (client-facing) ──────────────────────────────
         /// <summary>
-        /// Creates a new entity row and returns its GUID. The client stores this ID as their
-        /// cross-system entity reference.
-        /// </summary>
-        Task<string> CreateEntityAsync(CancellationToken ct = default);
-
-        /// <summary>
-        /// Records the entity→workflow mapping in the consumer DB after a successful engine trigger.
+        /// Upserts the consumer-side instance mirror after a successful engine trigger.
         /// Called by the service layer once it has a <see cref="LifeCycleTriggerResult"/> back from the engine.
         /// </summary>
-        Task RecordEntityWorkflowAsync(string entityId, string defName, LifeCycleTriggerResult result, CancellationToken ct = default);
+        Task RecordInstanceAsync(string entityGuid, string defName, LifeCycleTriggerResult result, CancellationToken ct = default);
 
         /// <summary>
-        /// Returns all workflows the entity is enrolled in (one row per definition it was triggered for).
+        /// Returns all instances associated with the given entity GUID across all definitions.
         /// </summary>
-        Task<DbRows> GetWorkflowsByEntityAsync(string entityId, CancellationToken ct = default);
+        Task<DbRows> GetInstancesByEntityAsync(string entityGuid, CancellationToken ct = default);
 
         // ── Lifecycle ─────────────────────────────────────────────────────────
         Task StartAsync(CancellationToken ct = default);
