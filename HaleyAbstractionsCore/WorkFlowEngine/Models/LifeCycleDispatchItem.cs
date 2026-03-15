@@ -14,6 +14,7 @@ namespace Haley.Models {
         public long ConsumerId { get; set; }
         public int AckStatus { get; set; }
         public int TriggerCount { get; set; }
+        public int MaxTrigger { get; set; }
         public DateTime LastTrigger { get; set; }
         public DateTime? NextDue { get; set; }
         public ILifeCycleEvent Event { get; set; } = default!;

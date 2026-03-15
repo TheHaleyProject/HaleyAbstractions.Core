@@ -31,11 +31,19 @@ namespace Haley.Abstractions {
         IWorkFlowConsumerManager RegisterAssembly(string assemblyName);
 
         // ── Administrative reads ──────────────────────────────────────────────
-        Task<DbRows> ListWorkflowsAsync(int skip, int take, CancellationToken ct = default);
-        Task<DbRows> ListInboxAsync(int? status, int skip, int take, CancellationToken ct = default);
-        Task<DbRows> ListOutboxAsync(int? status, int skip, int take, CancellationToken ct = default);
+        Task<DbRows> ListWorkflowsAsync(ConsumerWorkflowFilter filter, CancellationToken ct = default);
+        Task<DbRows> ListInboxAsync(ConsumerInboxFilter filter, CancellationToken ct = default);
+        Task<DbRows> ListInboxStatusesAsync(ConsumerInboxStatusFilter filter, CancellationToken ct = default);
+        Task<DbRows> ListOutboxAsync(ConsumerOutboxFilter filter, CancellationToken ct = default);
         Task<long> CountPendingInboxAsync(CancellationToken ct = default);
         Task<long> CountPendingOutboxAsync(CancellationToken ct = default);
+
+        /// <summary>
+        /// Returns the full consumer-side history for a workflow instance:
+        /// every inbox event (transitions + hooks) with its processing status, outbox ACK record,
+        /// outbox retry history, and handler step checkpoints — all correlated by instance_guid.
+        /// </summary>
+        Task<ConsumerTimeline> GetConsumerTimelineAsync(string instanceGuid, CancellationToken ct = default);
 
         // ── Entity & Workflow management (client-facing) ──────────────────────
         /// <summary>

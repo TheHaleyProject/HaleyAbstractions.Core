@@ -34,6 +34,12 @@ namespace Haley.Abstractions {
         // fires the auto-start event so it begins a fresh run. Useful for reopen and idempotency testing.
         // Returns Applied=false with Reason="NotTerminal" if the instance is not in a terminal state.
         Task<LifeCycleTriggerResult> ReopenAsync(string instanceGuid, string actor, CancellationToken ct = default);
+        // Extends the retry budget of all Failed ack_consumer rows for the instance
+        // (max_trigger = trigger_count + globalMaxRetryCount) and clears the Suspended flag.
+        // Use this when an instance was suspended because its ACK retry count was exhausted.
+        // trigger_count is never reset — it remains a monotonically increasing audit counter.
+        // Returns false if the instance does not exist; throws if it is not in the Suspended state.
+        Task<bool> UnsuspendAsync(string instanceGuid, string actor, CancellationToken ct = default);
     }
 }
 
