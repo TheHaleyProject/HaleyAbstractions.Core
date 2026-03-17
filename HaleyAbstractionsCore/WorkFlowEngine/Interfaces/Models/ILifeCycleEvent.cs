@@ -14,7 +14,6 @@ namespace Haley.Abstractions {
         string EntityId { get; }
         string AckGuid { get; }
         DateTimeOffset OccurredAt { get; }
-        bool AckRequired { get; }
         string? OnSuccessEvent { get; } //For both transition and hook events.
         string? OnFailureEvent { get; }
         string? Metadata { get; }

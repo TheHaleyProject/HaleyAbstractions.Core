@@ -10,7 +10,6 @@ namespace Haley.Models {
         public string Event { get; set; }
         public string Actor { get; set; }
         public long? PolicyId { get; set; } //Optional.. User may decide to 
-        public bool AckRequired { get; set; } = true;
         public LifeCycleInstanceFlag? Flag { get; set; } = null;
         public string? Metadata { get; set; }
         public IReadOnlyDictionary<string, object> Payload { get; set; }
