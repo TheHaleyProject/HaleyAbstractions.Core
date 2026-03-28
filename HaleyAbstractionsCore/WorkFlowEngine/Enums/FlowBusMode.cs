@@ -1,8 +1,8 @@
 namespace Haley.Enums {
     public enum FlowBusMode {
-        /// <summary>Local sequential runner — no engine, no DB, no EventStore. Use WorkflowRelay.</summary>
+        /// <summary>Full engine-backed execution — WorkflowConsumerService creates and drives the instance.</summary>
+        Engine,
+        /// <summary>Local in-process runner — WorkflowRelayService drives the instance, zero infrastructure.</summary>
         Relay,
-        /// <summary>Full engine-backed execution via IWorkFlowEngineAccessor.TriggerAsync.</summary>
-        Executor,
     }
 }

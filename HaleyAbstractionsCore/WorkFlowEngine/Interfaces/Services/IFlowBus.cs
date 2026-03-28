@@ -5,32 +5,30 @@ using System.Threading.Tasks;
 
 namespace Haley.Abstractions {
     /// <summary>
-    /// Seam between business logic and the workflow sequencing mechanism.
+    /// Entry-point router for workflow initiation.
     ///
-    /// Business methods call NextAsync after completing a unit of work — they do not
-    /// know what comes next. FlowBus owns the sequence.
+    /// Business logic calls InitiateAsync to start a workflow — it has no knowledge of
+    /// whether the engine or the relay is running the sequence. FlowBus resolves the
+    /// executor based on GlobalMode and what is registered in the service collection.
     ///
-    /// Two implementations:
-    ///   Relay    → WorkflowRelay (local, zero infra, no engine required)
-    ///   Executor → ExecutorFlowBus (engine-backed, full persistence)
+    /// Mode resolution (when per-call Mode is null):
+    ///   GlobalMode == null  → Engine ?? Relay ?? throw
+    ///   GlobalMode == Engine → Engine or throw
+    ///   GlobalMode == Relay  → Relay or throw
     ///
-    /// Switching from Relay to Executor requires no business logic changes — only the
-    /// registered IFlowBus implementation changes.
+    /// Per-call Mode on FlowInitiateRequest overrides GlobalMode for that call.
     /// </summary>
     public interface IFlowBus {
-        FlowBusMode Mode { get; }
+        /// <summary>
+        /// Global mode setting (from appsettings / DI configuration).
+        /// Null means auto-resolve: Engine takes priority over Relay.
+        /// </summary>
+        FlowBusMode? GlobalMode { get; }
 
         /// <summary>
-        /// Advance the workflow sequence after completing a unit of work.
-        /// outcome selects the transition path when a state has multiple exits.
-        /// Returns FlowBusResult — Applied=false with Reason when blocked, never throws for flow reasons.
+        /// Initiate a workflow for the given entity.
+        /// Returns IFeedback — Status=false with Message when no executor is available or initiation fails.
         /// </summary>
-        Task<FlowBusResult> NextAsync(FlowContext ctx, string? outcome = null, CancellationToken ct = default);
-
-        /// <summary>
-        /// Returns current workflow status for the entity.
-        /// Returns null in Relay/WorkflowRelay mode (no persistence).
-        /// </summary>
-        Task<FlowStatus?> GetStatusAsync(FlowContext ctx, CancellationToken ct = default);
+        Task<IFeedback> InitiateAsync(FlowInitiateRequest request, CancellationToken ct = default);
     }
 }
