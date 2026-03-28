@@ -40,6 +40,18 @@ namespace Haley.Abstractions {
         // trigger_count is never reset — it remains a monotonically increasing audit counter.
         // Returns false if the instance does not exist; throws if it is not in the Suspended state.
         Task<bool> UnsuspendAsync(string instanceGuid, string actor, CancellationToken ct = default);
+
+        // ── Backfill ─────────────────────────────────────────────────────────────────────────────
+        // Returns a read-only projection of the definition (states, valid transitions, hook routes)
+        // so consumers can build and validate WorkflowBackfillObjects without hitting the engine DB.
+        // Returns null if the definition is not found for the given envCode + name.
+        Task<WorkflowDefinitionSnapshot?> GetDefinitionSnapshotAsync(int envCode, string definitionName, CancellationToken ct = default);
+
+        // Imports a pre-validated backfill object as read-only history.
+        // Writes instance, lifecycle, and hook rows exactly as provided; no ACKs, no hooks dispatched.
+        // Rejects objects where WorkflowBackfillObject.Validated == false.
+        // Call one entity at a time; do not import concurrently for the same entity.
+        Task<BackfillImportResult> ImportBackfillAsync(WorkflowBackfillObject obj, CancellationToken ct = default);
     }
 }
 
