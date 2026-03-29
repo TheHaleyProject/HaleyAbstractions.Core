@@ -27,13 +27,17 @@ namespace Haley.Models {
     public sealed class ConsumerTimelineItem {
         public long InboxId { get; set; }
         public string AckGuid { get; set; } = string.Empty;
-        /// <summary>WorkflowKind name — "Transition" or "Hook".</summary>
+        /// <summary>WorkflowKind name — "Transition", "Hook", or "Complete".</summary>
         public string Kind { get; set; } = string.Empty;
         public int? HandlerVersion { get; set; }
         public int? EventCode { get; set; }
         public string? Route { get; set; }
+        /// <summary>Transition dispatch mode. Null for Hook and Complete rows.</summary>
+        public TransitionDispatchMode? DispatchMode { get; set; }
         /// <summary>Gate or Effect. Null for Transition rows.</summary>
         public HookType? HookType { get; set; }
+        /// <summary>Consumer-resolved next event persisted into outbox for post-ACK triggering.</summary>
+        public int? NextEvent { get; set; }
         public int RunCount { get; set; }
         public DateTime Occurred { get; set; }
         public DateTime Created { get; set; }
