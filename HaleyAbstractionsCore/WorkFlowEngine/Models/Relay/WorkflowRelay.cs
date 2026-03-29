@@ -1,3 +1,4 @@
+using Haley.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -179,48 +180,61 @@ namespace Haley.Models {
             // Advance to ToState — hooks fire because we arrived at this state.
             ctx.CurrentState = transition.ToState;
 
-            foreach (var hook in transition.Hooks.OrderBy(h => h.OrderSeq)) {
+            var orderedHooks = transition.Hooks.OrderBy(h => h.OrderSeq).ToList();
+            int? pendingGateSuccessCode = null;
+
+            for (int i = 0; i < orderedHooks.Count; i++) {
+                var hook = orderedHooks[i];
                 ct.ThrowIfCancellationRequested();
+
+                // Effect hook — run, ignore result, always continue.
+                if (hook.Type == HookType.Effect) {
+                    if (_hookHandlers.TryGetValue(hook.Route, out var effectEntry)) {
+                        ctx.Parameters = hook.ParamCodes.Count > 0
+                            ? _snapshot.Parameters.Where(p => hook.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
+                            : System.Array.Empty<SnapshotParameter>();
+                        await effectEntry.Handler(ctx);
+                    }
+                    continue;
+                }
+
+                // Gate hook — if a previous gate already fired its success code, skip remaining gates.
+                if (pendingGateSuccessCode.HasValue) continue;
 
                 if (_monitor != null && !await _monitor(eventCode, ctx.EntityRef))
                     return RelayResult.Blocked(HaleyFlowErrorCodes.RelayBlockedByMonitor);
 
-                if (!_hookHandlers.TryGetValue(hook.Route, out var hookEntry)) continue;
+                if (!_hookHandlers.TryGetValue(hook.Route, out var gateEntry)) continue;
 
-                // Resolve parameters for this hook (hook-own params, or inherited from transition rule).
                 ctx.Parameters = hook.ParamCodes.Count > 0
                     ? _snapshot.Parameters.Where(p => hook.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
                     : System.Array.Empty<SnapshotParameter>();
 
-                var succeeded = await hookEntry.Handler(ctx);
+                var succeeded = await gateEntry.Handler(ctx);
 
-                // Non-blocking hooks: ignore result and complete codes entirely.
-                if (!hook.Blocking) continue;
-
-                // Blocking hook failed.
                 if (!succeeded) {
-                    if (hook.CompleteFailureCode.HasValue) {
-                        // Has failure code — skip remaining hooks, fire immediately.
+                    // Gate failed — terminate immediately, skip ALL remaining hooks.
+                    if (hook.CompleteFailureCode.HasValue)
                         return await NextAsync(ctx, hook.CompleteFailureCode.Value, ct);
-                    }
-                    // No failure path — roll back and stop.
                     ctx.CurrentState = transition.FromState;
                     return RelayResult.Blocked($"{HaleyFlowErrorCodes.RelayBlockingHookFailed}: {hook.Route}");
                 }
 
-                // Blocking hook succeeded.
+                // Gate succeeded with a success code — remember it, continue loop (effect hooks still run).
                 if (hook.CompleteSuccessCode.HasValue) {
-                    // Has success code — skip remaining hooks, fire immediately (same as failure termination).
-                    // This is intentional: a success code on a blocking hook means "I resolved this, stop escalating".
-                    return await NextAsync(ctx, hook.CompleteSuccessCode.Value, ct);
+                    pendingGateSuccessCode = hook.CompleteSuccessCode.Value;
+                    continue;
                 }
-                // No success code — continue to next hook.
+                // Gate succeeded with no code — continue to next hook normally.
             }
 
-            // All hooks complete with no terminating hook — fall back to transition handler's next code.
-            var finalCode = transitionNextCode;
-            if (finalCode.HasValue)
-                return await NextAsync(ctx, finalCode.Value, ct);
+            // If a gate terminated with a success code, fire it now (all effect hooks have run).
+            if (pendingGateSuccessCode.HasValue)
+                return await NextAsync(ctx, pendingGateSuccessCode.Value, ct);
+
+            // All hooks complete with no gate termination — fall back to transition handler's next code.
+            if (transitionNextCode.HasValue)
+                return await NextAsync(ctx, transitionNextCode.Value, ct);
 
             return RelayResult.Ok(ctx.CurrentState);
         }
@@ -237,12 +251,6 @@ namespace Haley.Models {
             return succeeded ? policySuccess : policyFailure;
         }
 
-        private static async Task<int?> ResolveNextCode(bool succeeded, RelayContext ctx, RelayHookHandlerEntry entry, int? policySuccess, int? policyFailure) {
-            if (entry.OnComplete != null) return await entry.OnComplete(succeeded, ctx);
-            if (entry.SuccessCode.HasValue || entry.FailureCode.HasValue)
-                return succeeded ? entry.SuccessCode : entry.FailureCode;
-            return succeeded ? policySuccess : policyFailure;
-        }
 
         // ── Internal entry types ──────────────────────────────────────────────────
 

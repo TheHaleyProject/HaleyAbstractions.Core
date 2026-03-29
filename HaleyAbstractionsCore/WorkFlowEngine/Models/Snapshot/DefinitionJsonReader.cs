@@ -1,3 +1,4 @@
+using Haley.Enums;
 using Haley.Utils;
 using System;
 using System.Collections.Generic;
@@ -227,10 +228,16 @@ namespace Haley.Models {
                 var route = h.GetString("route", "name");
                 if (string.IsNullOrWhiteSpace(route)) continue;
 
-                var label    = h.GetString("label") ?? string.Empty;
-                var blocking = h.GetBool("blocking") ?? true;
+                var label = h.GetString("label") ?? string.Empty;
+                // Read type field first ("gate"/"effect"); fall back to boolean blocking for backward compat.
+                HookType hookType;
+                var typeStr = h.GetString("type");
+                if (!string.IsNullOrWhiteSpace(typeStr))
+                    hookType = string.Equals(typeStr, "effect", StringComparison.OrdinalIgnoreCase) ? HookType.Effect : HookType.Gate;
+                else
+                    hookType = (h.GetBool("blocking") ?? true) ? HookType.Gate : HookType.Effect;
                 // No order specified — runs last (after all explicitly ordered hooks).
-                var order    = h.GetInt("order_seq", "orderSeq", "order") ?? int.MaxValue;
+                var order = h.GetInt("order_seq", "orderSeq", "order") ?? int.MaxValue;
 
                 int? successCode = null;
                 int? failureCode = null;
@@ -251,10 +258,10 @@ namespace Haley.Models {
                 }
 
                 result.Add(new SnapshotHookRoute {
-                    Route               = route!,
-                    Label               = label,
-                    Blocking            = blocking,
-                    OrderSeq            = order,
+                    Route    = route!,
+                    Label    = label,
+                    Type     = hookType,
+                    OrderSeq = order,
                     CompleteSuccessCode = successCode,
                     CompleteFailureCode = failureCode,
                     ParamCodes          = hookParamCodes,
