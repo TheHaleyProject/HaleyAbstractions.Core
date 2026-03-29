@@ -206,10 +206,6 @@ namespace Haley.Models {
 
                 var gatePhase = await ExecuteGatePhaseAsync(ctx, transition, eventCode, gateHooks, ct);
 
-                // Once an order is reached, its own effect phase always runs after the gates finish,
-                // regardless of whether the gate phase resolved success, failure, or pass-through.
-                await ExecuteEffectHooksAsync(ctx, effectHooks, ct);
-
                 if (gatePhase.Failed) {
                     if (gatePhase.IsBlocked)
                         return RelayResult.Blocked(gatePhase.BlockReason ?? HaleyFlowErrorCodes.RelayBlockedByMonitor);
@@ -220,6 +216,9 @@ namespace Haley.Models {
                     ctx.CurrentState = transition.FromState;
                     return RelayResult.Blocked(gatePhase.BlockReason ?? $"{HaleyFlowErrorCodes.RelayBlockingHookFailed}: order {group.Order}");
                 }
+
+                // Same-order effects run only when the gate phase completed successfully.
+                await ExecuteEffectHooksAsync(ctx, effectHooks, ct);
 
                 if (gatePhase.NextCode.HasValue) {
                     pendingGateSuccessCode = gatePhase.NextCode.Value;

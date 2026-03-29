@@ -135,12 +135,12 @@ namespace Haley.Models {
 
             // ── H3: Unreachable gate hooks — after a gate terminator (Warning) ──
             // A gate hook with a success code terminates later gate orders on the success path.
-            // Same-order effects still run, and later-order effects may still run if marked send=always.
-            // Only flag gate hooks that come after a gate terminator.
+            // Same-order effects may still run for that successful order, and later-order effects
+            // may still run if marked send=always. Only flag gate hooks that come after a gate terminator.
             int? terminatorOrder = null;
             foreach (var hook in hooks) {
                 if (terminatorOrder.HasValue && hook.OrderSeq > terminatorOrder.Value && hook.Type == HookType.Gate)
-                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.UnreachableHook, $"Gate hook '{hook.Route}' (order {hook.OrderSeq}) is unreachable — a previous gate hook at order {terminatorOrder} terminates later gate orders on success. Same-order effects still run, and later-order effects remain reachable only when marked send=always."));
+                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.UnreachableHook, $"Gate hook '{hook.Route}' (order {hook.OrderSeq}) is unreachable — a previous gate hook at order {terminatorOrder} terminates later gate orders on success. Same-order effects remain reachable only on that successful order, and later-order effects remain reachable only when marked send=always."));
 
                 // Only a gate hook with a success code can be a terminator.
                 if (hook.Type == HookType.Gate && hook.CompleteSuccessCode.HasValue && !terminatorOrder.HasValue)
