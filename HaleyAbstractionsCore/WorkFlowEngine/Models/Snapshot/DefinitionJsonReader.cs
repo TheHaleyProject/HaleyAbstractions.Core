@@ -223,7 +223,7 @@ namespace Haley.Models {
                 var hookType = !string.IsNullOrWhiteSpace(typeStr)
                     ? (string.Equals(typeStr, "effect", StringComparison.OrdinalIgnoreCase) ? HookType.Effect : HookType.Gate)
                     : ((h.GetBool("blocking") ?? true) ? HookType.Gate : HookType.Effect);
-                var order = h.GetInt("order") ?? int.MaxValue;
+                var order = h.GetInt("order") ?? 999;
 
                 int? successCode = null;
                 int? failureCode = null;
