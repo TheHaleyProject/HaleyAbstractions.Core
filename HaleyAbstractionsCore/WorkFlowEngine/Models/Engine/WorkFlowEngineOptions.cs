@@ -33,6 +33,11 @@ namespace Haley.Models {
         [ConfigurationKeyName("ack_gate")]
         public bool AckGateEnabled { get; set; } = false;
 
+        // Maximum seconds to wait for an effect hook ACK before marking it Abandoned and advancing.
+        // No retries — effect hooks get one window. Default: 60 seconds.
+        [ConfigurationKeyName("effect_timeout")]
+        public int EffectTimeoutSeconds { get; set; } = 60;
+
         // Preferred boundary contract:
         // caller resolves consumer GUIDs by (consumerType, envCode, definitionName).
         // Engine maps GUIDs to numeric consumer IDs internally.

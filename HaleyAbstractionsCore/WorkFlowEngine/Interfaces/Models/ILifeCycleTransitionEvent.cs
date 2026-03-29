@@ -11,6 +11,7 @@ namespace Haley.Abstractions {
         long ToStateId { get; }
         int EventCode { get; }
         string EventName { get; }
+        TransitionDispatchMode DispatchMode { get; }
         IReadOnlyDictionary<string, object?>? PrevStateMeta { get; }
     }
 }
