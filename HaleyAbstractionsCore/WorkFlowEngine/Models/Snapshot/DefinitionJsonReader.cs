@@ -10,17 +10,17 @@ namespace Haley.Models {
     /// Parses workflow definition + policy JSON into a <see cref="WorkflowDefinitionSnapshot"/>.
     ///
     /// Single source of truth for definition JSON parsing outside the engine.
-    /// WorkflowRelay.FromJson and any other local consumer of the definition JSON call this —
+    /// WorkflowRelay.FromJson and any other local consumer of the definition JSON call this -
     /// so if the JSON format evolves, only this class needs updating.
     ///
     /// The engine (BluePrintImporter) does its own parse for DB write purposes. This class
-    /// owns the read-only projection path (snapshot + relay) — no DB involved.
+    /// owns the read-only projection path (snapshot + relay) - no DB involved.
     /// </summary>
     public static class DefinitionJsonReader {
         /// <summary>
         /// Parse a definition JSON string into a WorkflowDefinitionSnapshot.
         /// Pass policyJson to merge hook routes from policy rules into transitions.
-        /// envCode is not in the JSON — pass it from the call site (defaults to 0 if unknown).
+        /// envCode is not in the JSON - pass it from the call site (defaults to 0 if unknown).
         /// </summary>
         public static WorkflowDefinitionSnapshot ReadSnapshot(string definitionJson, string? policyJson = null, int envCode = 0) {
             if (string.IsNullOrWhiteSpace(definitionJson)) throw new ArgumentNullException(nameof(definitionJson));
@@ -28,9 +28,12 @@ namespace Haley.Models {
             using var defDoc = JsonDocument.Parse(definitionJson);
             var root = defDoc.RootElement;
 
-            var defName     = root.GetString("name", "displayName", "defName", "definitionName") ?? string.Empty;
+            if (root.ValueKind != JsonValueKind.Object) throw new InvalidOperationException("Definition JSON root must be an object.");
+            if (root.TryGetProperty("definition", out _)) throw new InvalidOperationException("Legacy definition wrapper is not supported. Move definition fields to the top level.");
+
+            var defName = root.GetString("name") ?? throw new InvalidOperationException("Definition JSON must contain top-level 'name'.");
             var transitions = ParseTransitions(root);
-            var states      = ParseStates(root, transitions);
+            var states = ParseStates(root, transitions);
 
             var parameters = new List<SnapshotParameter>();
             if (!string.IsNullOrWhiteSpace(policyJson))
@@ -38,33 +41,31 @@ namespace Haley.Models {
 
             return new WorkflowDefinitionSnapshot {
                 DefinitionName = defName,
-                EnvCode        = envCode,
-                States         = states,
-                Transitions    = transitions,
-                Parameters     = parameters,
+                EnvCode = envCode,
+                States = states,
+                Transitions = transitions,
+                Parameters = parameters,
             };
         }
-
-        // ── Definition parsers ────────────────────────────────────────────────────
 
         private static List<SnapshotTransition> ParseTransitions(JsonElement root) {
             var result = new List<SnapshotTransition>();
             if (!root.TryGetProperty("transitions", out var arr) || arr.ValueKind != JsonValueKind.Array) return result;
 
             foreach (var t in arr.EnumerateArray()) {
-                var from = t.GetString("from", "fromState");
-                var to   = t.GetString("to",   "toState");
-                var code = t.GetInt("event", "eventCode");
-                var name = t.GetString("eventName", "event_name") ?? string.Empty;
+                if (t.ValueKind != JsonValueKind.Object) throw new InvalidOperationException("Each transition must be an object.");
 
-                if (string.IsNullOrWhiteSpace(from) || string.IsNullOrWhiteSpace(to) || !code.HasValue) continue;
+                var from = t.GetString("from") ?? throw new InvalidOperationException("Each transition must contain 'from'.");
+                var to = t.GetString("to") ?? throw new InvalidOperationException("Each transition must contain 'to'.");
+                var code = t.GetInt("event") ?? throw new InvalidOperationException("Each transition must contain integer 'event'.");
+                var name = t.GetString("eventName") ?? string.Empty;
 
                 result.Add(new SnapshotTransition {
-                    FromState = from!,
-                    ToState   = to!,
-                    EventCode = code.Value,
+                    FromState = from,
+                    ToState = to,
+                    EventCode = code,
                     EventName = name,
-                    Hooks     = Array.Empty<SnapshotHookRoute>(),
+                    Hooks = Array.Empty<SnapshotHookRoute>(),
                 });
             }
 
@@ -78,15 +79,15 @@ namespace Haley.Models {
             var hasOutgoing = new HashSet<string>(transitions.Select(t => t.FromState), StringComparer.OrdinalIgnoreCase);
 
             foreach (var s in arr.EnumerateArray()) {
-                var name = s.GetString("name", "displayName");
-                if (string.IsNullOrWhiteSpace(name)) continue;
+                if (s.ValueKind != JsonValueKind.Object) throw new InvalidOperationException("Each state must be an object.");
 
-                var isInitial  = s.GetBool("isInitial",  "is_initial")  ?? false;
-                var isTerminal = s.GetBool("isFinal",    "is_final",    "isTerminal", "is_terminal") ?? !hasOutgoing.Contains(name!);
+                var name = s.GetString("name") ?? throw new InvalidOperationException("Each state must contain 'name'.");
+                var isInitial = s.GetBool("is_initial") ?? false;
+                var isTerminal = s.GetBool("is_final") ?? !hasOutgoing.Contains(name);
 
                 result.Add(new SnapshotState {
-                    Name       = name!,
-                    IsInitial  = isInitial,
+                    Name = name,
+                    IsInitial = isInitial,
                     IsTerminal = isTerminal,
                 });
             }
@@ -94,13 +95,10 @@ namespace Haley.Models {
             return result;
         }
 
-        // ── Policy merger ─────────────────────────────────────────────────────────
-
         private static void MergePolicyHooks(string policyJson, List<SnapshotTransition> transitions, List<SnapshotParameter> parameters) {
             using var doc = JsonDocument.Parse(policyJson);
             var root = doc.RootElement;
 
-            // Parse top-level params catalog.
             if (root.TryGetProperty("params", out var paramsArr) && paramsArr.ValueKind == JsonValueKind.Array) {
                 foreach (var p in paramsArr.EnumerateArray()) {
                     var code = p.GetString("code");
@@ -114,20 +112,11 @@ namespace Haley.Models {
 
             if (!root.TryGetProperty("rules", out var rules) || rules.ValueKind != JsonValueKind.Array) return;
 
-            // Two-pass merge:
-            //   Pass 1 — via-specific rules (via is set). Apply first and record which transition indices were claimed.
-            //   Pass 2 — general rules (no via). Only apply to transitions not already claimed by a via-specific rule.
-            //
-            // This means: if a state has both a via-specific rule (e.g. via=2005) and a general rule,
-            // the transition arriving via 2005 uses the via-specific rule and the general rule is skipped for it.
-            // Other transitions arriving at the same state use the general rule.
+            var claimed = new HashSet<int>();
 
-            var claimed = new HashSet<int>(); // indices of transitions already assigned by a via-specific rule
-
-            // ── Pass 1: via-specific rules ────────────────────────────────────────
             foreach (var rule in rules.EnumerateArray()) {
                 var via = rule.GetInt("via");
-                if (!via.HasValue) continue;  // skip general rules in this pass
+                if (!via.HasValue) continue;
 
                 var stateName = rule.GetString("state");
                 if (string.IsNullOrWhiteSpace(stateName)) continue;
@@ -144,10 +133,9 @@ namespace Haley.Models {
                 }
             }
 
-            // ── Pass 2: general rules (no via) — skip claimed transitions ─────────
             foreach (var rule in rules.EnumerateArray()) {
                 var via = rule.GetInt("via");
-                if (via.HasValue) continue;  // skip via-specific rules in this pass
+                if (via.HasValue) continue;
 
                 var stateName = rule.GetString("state");
                 if (string.IsNullOrWhiteSpace(stateName)) continue;
@@ -155,7 +143,7 @@ namespace Haley.Models {
                 var (successCode, failureCode, paramCodes, hooks) = ParseRuleBody(rule);
 
                 for (var i = 0; i < transitions.Count; i++) {
-                    if (claimed.Contains(i)) continue;  // already claimed by a via-specific rule
+                    if (claimed.Contains(i)) continue;
                     var tr = transitions[i];
                     if (!string.Equals(tr.ToState, stateName, StringComparison.OrdinalIgnoreCase)) continue;
 
@@ -176,7 +164,8 @@ namespace Haley.Models {
             if (rule.TryGetProperty("params", out var ruleParams) && ruleParams.ValueKind == JsonValueKind.Array) {
                 var codes = new List<string>();
                 foreach (var pc in ruleParams.EnumerateArray()) {
-                    var c = pc.ValueKind == JsonValueKind.String ? pc.GetString() : pc.GetString("code");
+                    if (pc.ValueKind != JsonValueKind.String) throw new InvalidOperationException("Rule params must be a string array of parameter codes.");
+                    var c = pc.GetString();
                     if (!string.IsNullOrWhiteSpace(c)) codes.Add(c!);
                 }
                 paramCodes = codes;
@@ -191,14 +180,14 @@ namespace Haley.Models {
 
         private static SnapshotTransition ApplyRule(SnapshotTransition tr, int? successCode, int? failureCode, IReadOnlyList<SnapshotHookRoute> hooks, IReadOnlyList<string> paramCodes) {
             return new SnapshotTransition {
-                FromState           = tr.FromState,
-                ToState             = tr.ToState,
-                EventCode           = tr.EventCode,
-                EventName           = tr.EventName,
+                FromState = tr.FromState,
+                ToState = tr.ToState,
+                EventCode = tr.EventCode,
+                EventName = tr.EventName,
                 CompleteSuccessCode = successCode,
                 CompleteFailureCode = failureCode,
-                Hooks               = hooks,
-                ParamCodes          = paramCodes,
+                Hooks = hooks,
+                ParamCodes = paramCodes,
             };
         }
 
@@ -211,13 +200,13 @@ namespace Haley.Models {
 
         private static object? ParseJsonValue(JsonElement el) {
             return el.ValueKind switch {
-                JsonValueKind.Object  => ParseObjectAsDictionary(el),
-                JsonValueKind.Array   => el.EnumerateArray().Select(ParseJsonValue).ToList(),
-                JsonValueKind.String  => el.GetString(),
-                JsonValueKind.Number  => el.TryGetInt64(out var l) ? (object?)l : el.GetDouble(),
-                JsonValueKind.True    => true,
-                JsonValueKind.False   => false,
-                _                     => null,
+                JsonValueKind.Object => ParseObjectAsDictionary(el),
+                JsonValueKind.Array => el.EnumerateArray().Select(ParseJsonValue).ToList(),
+                JsonValueKind.String => el.GetString(),
+                JsonValueKind.Number => el.TryGetInt64(out var l) ? (object?)l : el.GetDouble(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                _ => null,
             };
         }
 
@@ -225,19 +214,16 @@ namespace Haley.Models {
             var result = new List<SnapshotHookRoute>();
 
             foreach (var h in emitArr.EnumerateArray()) {
-                var route = h.GetString("route", "name");
-                if (string.IsNullOrWhiteSpace(route)) continue;
+                if (h.ValueKind != JsonValueKind.Object) throw new InvalidOperationException("Each emit hook must be an object.");
+                if (h.TryGetProperty("orderSeq", out _) || h.TryGetProperty("order_seq", out _)) throw new InvalidOperationException("Legacy emit order aliases are not supported. Use 'order'.");
 
+                var route = h.GetString("route") ?? throw new InvalidOperationException("Each emit hook must contain 'route'.");
                 var label = h.GetString("label") ?? string.Empty;
-                // Read type field first ("gate"/"effect"); fall back to boolean blocking for backward compat.
-                HookType hookType;
                 var typeStr = h.GetString("type");
-                if (!string.IsNullOrWhiteSpace(typeStr))
-                    hookType = string.Equals(typeStr, "effect", StringComparison.OrdinalIgnoreCase) ? HookType.Effect : HookType.Gate;
-                else
-                    hookType = (h.GetBool("blocking") ?? true) ? HookType.Gate : HookType.Effect;
-                // No order specified — runs last (after all explicitly ordered hooks).
-                var order = h.GetInt("order_seq", "orderSeq", "order") ?? int.MaxValue;
+                var hookType = !string.IsNullOrWhiteSpace(typeStr)
+                    ? (string.Equals(typeStr, "effect", StringComparison.OrdinalIgnoreCase) ? HookType.Effect : HookType.Gate)
+                    : ((h.GetBool("blocking") ?? true) ? HookType.Gate : HookType.Effect);
+                var order = h.GetInt("order") ?? int.MaxValue;
 
                 int? successCode = null;
                 int? failureCode = null;
@@ -246,25 +232,25 @@ namespace Haley.Models {
                     failureCode = complete.GetInt("failure");
                 }
 
-                // Hook-own params take priority; fall back to parent rule params if hook defines none.
                 IReadOnlyList<string> hookParamCodes = ruleParamCodes;
                 if (h.TryGetProperty("params", out var hookParams) && hookParams.ValueKind == JsonValueKind.Array) {
                     var codes = new List<string>();
                     foreach (var pc in hookParams.EnumerateArray()) {
-                        var c = pc.ValueKind == JsonValueKind.String ? pc.GetString() : pc.GetString("code");
+                        if (pc.ValueKind != JsonValueKind.String) throw new InvalidOperationException("Hook params must be a string array of parameter codes.");
+                        var c = pc.GetString();
                         if (!string.IsNullOrWhiteSpace(c)) codes.Add(c!);
                     }
                     hookParamCodes = codes;
                 }
 
                 result.Add(new SnapshotHookRoute {
-                    Route    = route!,
-                    Label    = label,
-                    Type     = hookType,
+                    Route = route,
+                    Label = label,
+                    Type = hookType,
                     OrderSeq = order,
                     CompleteSuccessCode = successCode,
                     CompleteFailureCode = failureCode,
-                    ParamCodes          = hookParamCodes,
+                    ParamCodes = hookParamCodes,
                 });
             }
 
