@@ -224,6 +224,7 @@ namespace Haley.Models {
                     ? (string.Equals(typeStr, "effect", StringComparison.OrdinalIgnoreCase) ? HookType.Effect : HookType.Gate)
                     : ((h.GetBool("blocking") ?? true) ? HookType.Gate : HookType.Effect);
                 var order = h.GetInt("order") ?? 999;
+                var sendStr = h.GetString("send");
 
                 int? successCode = null;
                 int? failureCode = null;
@@ -248,6 +249,7 @@ namespace Haley.Models {
                     Label = label,
                     Type = hookType,
                     OrderSeq = order,
+                    SendModeRaw = string.IsNullOrWhiteSpace(sendStr) ? null : sendStr,
                     CompleteSuccessCode = successCode,
                     CompleteFailureCode = failureCode,
                     ParamCodes = hookParamCodes,

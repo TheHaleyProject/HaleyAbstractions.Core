@@ -110,6 +110,19 @@ namespace Haley.Models {
             foreach (var hook in hooks.Where(h => h.Type == HookType.Effect && (h.CompleteSuccessCode.HasValue || h.CompleteFailureCode.HasValue)))
                 findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.NonBlockingWithComplete, $"Effect hook '{hook.Route}' defines complete codes but they are ignored at runtime."));
 
+            // ── H1b: send is effect-only and supports only 'no' / 'always' (Error) ────
+            foreach (var hook in hooks.Where(h => !string.IsNullOrWhiteSpace(h.SendModeRaw))) {
+                if (hook.Type != HookType.Effect) {
+                    findings.Add(Error(state, via, hook.Route, HaleyFlowErrorCodes.InvalidSendTarget, $"Hook '{hook.Route}' defines send='{hook.SendModeRaw}' but the send directive is valid only for effect hooks."));
+                    continue;
+                }
+
+                if (!string.Equals(hook.SendModeRaw, "no", System.StringComparison.OrdinalIgnoreCase)
+                    && !string.Equals(hook.SendModeRaw, "always", System.StringComparison.OrdinalIgnoreCase)) {
+                    findings.Add(Error(state, via, hook.Route, HaleyFlowErrorCodes.InvalidSendValue, $"Effect hook '{hook.Route}' defines invalid send value '{hook.SendModeRaw}'. Allowed values are 'no' and 'always'."));
+                }
+            }
+
             var gateHooks = hooks.Where(h => h.Type == HookType.Gate).ToList();
 
             // ── H2: Multiple gate hooks at the same order with complete codes (Error) ────
@@ -121,13 +134,13 @@ namespace Haley.Models {
                 findings.Add(Error(state, via, null, HaleyFlowErrorCodes.AmbiguousOrder, $"Multiple gate hooks at order {group.Key} define complete codes: {string.Join(", ", group.Select(h => h.Route))}. Execution order is undefined."));
 
             // ── H3: Unreachable gate hooks — after a gate terminator (Warning) ──
-            // A gate hook with a success code is a terminator: remaining gate hooks are skipped.
-            // Effect hooks after a terminator still run on the success path — they are NOT unreachable.
+            // A gate hook with a success code terminates later gate orders on the success path.
+            // Same-order effects still run, and later-order effects may still run if marked send=always.
             // Only flag gate hooks that come after a gate terminator.
             int? terminatorOrder = null;
             foreach (var hook in hooks) {
                 if (terminatorOrder.HasValue && hook.OrderSeq > terminatorOrder.Value && hook.Type == HookType.Gate)
-                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.UnreachableHook, $"Gate hook '{hook.Route}' (order {hook.OrderSeq}) is unreachable — a previous gate hook at order {terminatorOrder} terminates on success. Effect hooks at higher orders still run."));
+                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.UnreachableHook, $"Gate hook '{hook.Route}' (order {hook.OrderSeq}) is unreachable — a previous gate hook at order {terminatorOrder} terminates later gate orders on success. Same-order effects still run, and later-order effects remain reachable only when marked send=always."));
 
                 // Only a gate hook with a success code can be a terminator.
                 if (hook.Type == HookType.Gate && hook.CompleteSuccessCode.HasValue && !terminatorOrder.HasValue)

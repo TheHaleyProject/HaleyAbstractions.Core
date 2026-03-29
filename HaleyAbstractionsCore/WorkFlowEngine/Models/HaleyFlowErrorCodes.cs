@@ -51,6 +51,12 @@ namespace Haley.Models {
         /// <summary>Multiple blocking hooks at the same order define complete codes — execution order is undefined.</summary>
         public const string AmbiguousOrder         = "HFP2002";   // Error
 
+        /// <summary>The send directive is defined on a gate hook — send is valid only for effect hooks.</summary>
+        public const string InvalidSendTarget      = "HFP2003";   // Error
+
+        /// <summary>The send directive has an invalid value — only "no" and "always" are permitted.</summary>
+        public const string InvalidSendValue       = "HFP2004";   // Error
+
         /// <summary>Non-blocking hook defines complete codes — they are silently ignored at runtime.</summary>
         public const string NonBlockingWithComplete = "HFP2101";  // Warning
 

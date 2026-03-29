@@ -180,55 +180,54 @@ namespace Haley.Models {
             // Advance to ToState — hooks fire because we arrived at this state.
             ctx.CurrentState = transition.ToState;
 
-            var orderedHooks = transition.Hooks.OrderBy(h => h.OrderSeq).ToList();
+            var groupedOrders = transition.Hooks
+                .OrderBy(h => h.OrderSeq)
+                .GroupBy(h => h.OrderSeq)
+                .Select(g => new {
+                    Order = g.Key,
+                    Hooks = g.ToList(),
+                })
+                .ToList();
+
             int? pendingGateSuccessCode = null;
 
-            for (int i = 0; i < orderedHooks.Count; i++) {
-                var hook = orderedHooks[i];
+            foreach (var group in groupedOrders) {
                 ct.ThrowIfCancellationRequested();
 
-                // Effect hook — run, ignore result, always continue.
-                if (hook.Type == HookType.Effect) {
-                    if (_hookHandlers.TryGetValue(hook.Route, out var effectEntry)) {
-                        ctx.Parameters = hook.ParamCodes.Count > 0
-                            ? _snapshot.Parameters.Where(p => hook.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
-                            : System.Array.Empty<SnapshotParameter>();
-                        await effectEntry.Handler(ctx);
-                    }
+                var gateHooks = group.Hooks.Where(h => h.Type == HookType.Gate).ToList();
+                var effectHooks = group.Hooks.Where(h => h.Type == HookType.Effect).ToList();
+
+                // A previously resolved gate-success short-circuits later gate orders.
+                // Only effect hooks explicitly marked send=always remain reachable on the success path.
+                if (pendingGateSuccessCode.HasValue) {
+                    await ExecuteEffectHooksAsync(ctx, effectHooks.Where(h => h.SendAlways), ct);
                     continue;
                 }
 
-                // Gate hook — if a previous gate already fired its success code, skip remaining gates.
-                if (pendingGateSuccessCode.HasValue) continue;
+                var gatePhase = await ExecuteGatePhaseAsync(ctx, transition, eventCode, gateHooks, ct);
 
-                if (_monitor != null && !await _monitor(eventCode, ctx.EntityRef))
-                    return RelayResult.Blocked(HaleyFlowErrorCodes.RelayBlockedByMonitor);
+                // Once an order is reached, its own effect phase always runs after the gates finish,
+                // regardless of whether the gate phase resolved success, failure, or pass-through.
+                await ExecuteEffectHooksAsync(ctx, effectHooks, ct);
 
-                if (!_hookHandlers.TryGetValue(hook.Route, out var gateEntry)) continue;
+                if (gatePhase.Failed) {
+                    if (gatePhase.IsBlocked)
+                        return RelayResult.Blocked(gatePhase.BlockReason ?? HaleyFlowErrorCodes.RelayBlockedByMonitor);
 
-                ctx.Parameters = hook.ParamCodes.Count > 0
-                    ? _snapshot.Parameters.Where(p => hook.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
-                    : System.Array.Empty<SnapshotParameter>();
+                    if (gatePhase.NextCode.HasValue)
+                        return await NextAsync(ctx, gatePhase.NextCode.Value, ct);
 
-                var succeeded = await gateEntry.Handler(ctx);
-
-                if (!succeeded) {
-                    // Gate failed — terminate immediately, skip ALL remaining hooks.
-                    if (hook.CompleteFailureCode.HasValue)
-                        return await NextAsync(ctx, hook.CompleteFailureCode.Value, ct);
                     ctx.CurrentState = transition.FromState;
-                    return RelayResult.Blocked($"{HaleyFlowErrorCodes.RelayBlockingHookFailed}: {hook.Route}");
+                    return RelayResult.Blocked(gatePhase.BlockReason ?? $"{HaleyFlowErrorCodes.RelayBlockingHookFailed}: order {group.Order}");
                 }
 
-                // Gate succeeded with a success code — remember it, continue loop (effect hooks still run).
-                if (hook.CompleteSuccessCode.HasValue) {
-                    pendingGateSuccessCode = hook.CompleteSuccessCode.Value;
+                if (gatePhase.NextCode.HasValue) {
+                    pendingGateSuccessCode = gatePhase.NextCode.Value;
                     continue;
                 }
-                // Gate succeeded with no code — continue to next hook normally.
             }
 
-            // If a gate terminated with a success code, fire it now (all effect hooks have run).
+            // If a gate resolved a success code, fire it now (all reachable effect phases have run).
             if (pendingGateSuccessCode.HasValue)
                 return await NextAsync(ctx, pendingGateSuccessCode.Value, ct);
 
@@ -251,8 +250,74 @@ namespace Haley.Models {
             return succeeded ? policySuccess : policyFailure;
         }
 
+        private static async Task<int?> ResolveNextCode(bool succeeded, RelayContext ctx, RelayHookHandlerEntry entry, int? policySuccess, int? policyFailure) {
+            if (entry.OnComplete != null) return await entry.OnComplete(succeeded, ctx);
+            if (entry.SuccessCode.HasValue || entry.FailureCode.HasValue)
+                return succeeded ? entry.SuccessCode : entry.FailureCode;
+            return succeeded ? policySuccess : policyFailure;
+        }
+
+        private async Task ExecuteEffectHooksAsync(RelayContext ctx, IEnumerable<SnapshotHookRoute> hooks, CancellationToken ct) {
+            foreach (var hook in hooks) {
+                ct.ThrowIfCancellationRequested();
+                if (!_hookHandlers.TryGetValue(hook.Route, out var effectEntry)) continue;
+
+                ctx.Parameters = hook.ParamCodes.Count > 0
+                    ? _snapshot.Parameters.Where(p => hook.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
+                    : System.Array.Empty<SnapshotParameter>();
+
+                await effectEntry.Handler(ctx);
+            }
+        }
+
+        private async Task<GatePhaseResult> ExecuteGatePhaseAsync(RelayContext ctx, SnapshotTransition transition, int eventCode, IReadOnlyList<SnapshotHookRoute> gateHooks, CancellationToken ct) {
+            if (gateHooks.Count == 0) return GatePhaseResult.None;
+
+            int? successCode = null;
+            int? failureCode = null;
+            var failed = false;
+
+            foreach (var hook in gateHooks) {
+                ct.ThrowIfCancellationRequested();
+
+                if (_monitor != null && !await _monitor(eventCode, ctx.EntityRef))
+                    return GatePhaseResult.Blocked(HaleyFlowErrorCodes.RelayBlockedByMonitor);
+
+                if (!_hookHandlers.TryGetValue(hook.Route, out var gateEntry)) continue;
+
+                ctx.Parameters = hook.ParamCodes.Count > 0
+                    ? _snapshot.Parameters.Where(p => hook.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
+                    : System.Array.Empty<SnapshotParameter>();
+
+                var succeeded = await gateEntry.Handler(ctx);
+                var resolvedCode = await ResolveNextCode(succeeded, ctx, gateEntry, hook.CompleteSuccessCode, hook.CompleteFailureCode);
+
+                if (!succeeded) {
+                    failed = true;
+                    failureCode ??= resolvedCode ?? transition.CompleteFailureCode;
+                    continue;
+                }
+
+                successCode ??= resolvedCode;
+            }
+
+            if (failed)
+                return failureCode.HasValue
+                    ? GatePhaseResult.Fail(failureCode.Value)
+                    : GatePhaseResult.Blocked(HaleyFlowErrorCodes.RelayBlockingHookFailed);
+
+            return successCode.HasValue ? GatePhaseResult.Success(successCode.Value) : GatePhaseResult.None;
+        }
+
 
         // ── Internal entry types ──────────────────────────────────────────────────
+
+        private readonly record struct GatePhaseResult(bool Failed, bool IsBlocked, int? NextCode, string? BlockReason) {
+            public static GatePhaseResult None => new(false, false, null, null);
+            public static GatePhaseResult Blocked(string reason) => new(true, true, null, reason);
+            public static GatePhaseResult Success(int nextCode) => new(false, false, nextCode, null);
+            public static GatePhaseResult Fail(int nextCode) => new(true, false, nextCode, null);
+        }
 
         private sealed class RelayHandlerEntry {
             public Func<RelayContext, Task<bool>>              Handler    { get; }
