@@ -14,7 +14,7 @@ namespace Haley.Abstractions {
         string EntityId { get; }
         string AckGuid { get; }
         DateTimeOffset OccurredAt { get; }
-        string? OnSuccessEvent { get; } //For both transition and hook events.
+        string? OnSuccessEvent { get; } // Used by transition and hook events; Complete events generally leave this null.
         string? OnFailureEvent { get; }
         string? Metadata { get; }
         IReadOnlyList<LifeCycleParamItem>? Params { get; } 
