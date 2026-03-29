@@ -1,3 +1,4 @@
+using Haley.Enums;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -105,40 +106,38 @@ namespace Haley.Models {
             var state = transition.ToState;
             int? via  = transition.EventCode;
 
-            // ── H1: Non-blocking hooks with complete codes (Warning — ignored at runtime) ────
-            foreach (var hook in hooks.Where(h => !h.Blocking && (h.CompleteSuccessCode.HasValue || h.CompleteFailureCode.HasValue)))
-                findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.NonBlockingWithComplete, $"Non-blocking hook '{hook.Route}' defines complete codes but they are ignored at runtime."));
+            // ── H1: Effect hooks with complete codes (Warning — ignored at runtime) ────
+            foreach (var hook in hooks.Where(h => h.Type == HookType.Effect && (h.CompleteSuccessCode.HasValue || h.CompleteFailureCode.HasValue)))
+                findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.NonBlockingWithComplete, $"Effect hook '{hook.Route}' defines complete codes but they are ignored at runtime."));
 
-            var blockingHooks = hooks.Where(h => h.Blocking).ToList();
+            var gateHooks = hooks.Where(h => h.Type == HookType.Gate).ToList();
 
-            // ── H2: Multiple blocking hooks at the same order with complete codes (Error) ────
-            var orderGroups = blockingHooks
+            // ── H2: Multiple gate hooks at the same order with complete codes (Error) ────
+            var orderGroups = gateHooks
                 .Where(h => h.CompleteSuccessCode.HasValue || h.CompleteFailureCode.HasValue)
                 .GroupBy(h => h.OrderSeq)
                 .Where(g => g.Count() > 1);
             foreach (var group in orderGroups)
-                findings.Add(Error(state, via, null, HaleyFlowErrorCodes.AmbiguousOrder, $"Multiple blocking hooks at order {group.Key} define complete codes: {string.Join(", ", group.Select(h => h.Route))}. Execution order is undefined."));
+                findings.Add(Error(state, via, null, HaleyFlowErrorCodes.AmbiguousOrder, $"Multiple gate hooks at order {group.Key} define complete codes: {string.Join(", ", group.Select(h => h.Route))}. Execution order is undefined."));
 
-            // ── H3: Unreachable hooks — after any terminator (Warning) ──
-            // Walk ALL hooks in order (blocking and non-blocking). Once a blocking hook with a success
-            // code is encountered, everything after it is unreachable on the success path — including
-            // non-blocking hooks, which will never be reached if the terminator fires first.
-            // A failure-only blocking hook does NOT terminate on success, so hooks after it still run.
+            // ── H3: Unreachable gate hooks — after a gate terminator (Warning) ──
+            // A gate hook with a success code is a terminator: remaining gate hooks are skipped.
+            // Effect hooks after a terminator still run on the success path — they are NOT unreachable.
+            // Only flag gate hooks that come after a gate terminator.
             int? terminatorOrder = null;
             foreach (var hook in hooks) {
-                if (terminatorOrder.HasValue && hook.OrderSeq > terminatorOrder.Value) {
-                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.UnreachableHook, $"Hook '{hook.Route}' (order {hook.OrderSeq}) is unreachable — a previous blocking hook at order {terminatorOrder} terminates on success."));
-                    continue;
-                }
-                // Only a blocking hook with a success code can be a terminator.
-                if (hook.Blocking && hook.CompleteSuccessCode.HasValue)
+                if (terminatorOrder.HasValue && hook.OrderSeq > terminatorOrder.Value && hook.Type == HookType.Gate)
+                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.UnreachableHook, $"Gate hook '{hook.Route}' (order {hook.OrderSeq}) is unreachable — a previous gate hook at order {terminatorOrder} terminates on success. Effect hooks at higher orders still run."));
+
+                // Only a gate hook with a success code can be a terminator.
+                if (hook.Type == HookType.Gate && hook.CompleteSuccessCode.HasValue && !terminatorOrder.HasValue)
                     terminatorOrder = hook.OrderSeq;
             }
 
-            // ── H4: No failure path for blocking hook (Warning — code-side Tier 2/3 may handle it) ──
-            foreach (var hook in blockingHooks) {
+            // ── H4: No failure path for gate hook (Warning — code-side Tier 2/3 may handle it) ──
+            foreach (var hook in gateHooks) {
                 if (!hook.CompleteFailureCode.HasValue && !transition.CompleteFailureCode.HasValue)
-                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.NoFailurePath, $"Blocking hook '{hook.Route}' has no failure complete code and the transition has no failure complete code. On failure the system cannot auto-advance — code-side handler (Tier 2/3) must decide the next step."));
+                    findings.Add(Warn(state, via, hook.Route, HaleyFlowErrorCodes.NoFailurePath, $"Gate hook '{hook.Route}' has no failure complete code and the transition has no failure complete code. On failure the system cannot auto-advance — code-side handler (Tier 2/3) must decide the next step."));
             }
         }
 
