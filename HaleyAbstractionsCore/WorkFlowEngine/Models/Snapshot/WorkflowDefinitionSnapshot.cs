@@ -11,5 +11,7 @@ namespace Haley.Models {
         public int    EnvCode        { get; init; }
         public IReadOnlyList<SnapshotState>      States      { get; init; } = System.Array.Empty<SnapshotState>();
         public IReadOnlyList<SnapshotTransition> Transitions { get; init; } = System.Array.Empty<SnapshotTransition>();
+        /// <summary>Top-level parameter catalog from the policy JSON params array. Keyed by Code for quick lookup.</summary>
+        public IReadOnlyList<SnapshotParameter>  Parameters  { get; init; } = System.Array.Empty<SnapshotParameter>();
     }
 }

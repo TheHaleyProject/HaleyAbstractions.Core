@@ -6,6 +6,6 @@ namespace Haley.Models {
     /// Mode null means auto-resolve: Engine ?? Relay ?? throw.
     /// </summary>
     public sealed class FlowBusOptions {
-        public FlowBusMode? Mode { get; set; }
+        public FlowBusMode? Mode { get; set; } //Default mode.
     }
 }

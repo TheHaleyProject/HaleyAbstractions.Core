@@ -10,5 +10,7 @@ namespace Haley.Models {
 
         public static RelayResult Ok(string newState)      => new() { Advanced = true,  NewState = newState };
         public static RelayResult Blocked(string reason)   => new() { Advanced = false, Reason   = reason  };
+
+        public override string ToString() => Advanced ? $"Advanced → {NewState}" : $"Blocked: {Reason}";
     }
 }

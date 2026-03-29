@@ -41,12 +41,29 @@ namespace Haley.Models {
         /// Without policyJson only transition handlers run — hooks are unknown.
         /// </summary>
         public static WorkflowRelay FromJson(string definitionJson, string? policyJson = null, int envCode = 0) {
-            var snapshot = DefinitionJsonReader.ReadSnapshot(definitionJson, policyJson, envCode);
-            return new WorkflowRelay(snapshot);
+            var snapshot   = DefinitionJsonReader.ReadSnapshot(definitionJson, policyJson, envCode);
+            var validation = PolicyValidator.Validate(snapshot);
+
+            if (validation.HasCriticalErrors) {
+                foreach (var f in validation.Findings.Where(f => f.Severity == PolicyFindingSeverity.Error))
+                    Console.WriteLine($"[RELAY ERROR] {f}");
+                var errors = string.Join("; ", validation.Findings.Where(f => f.Severity == PolicyFindingSeverity.Error).Select(f => f.ToString()));
+                throw new InvalidOperationException($"Policy has critical errors and cannot be registered:\n{errors}");
+            }
+
+            if (validation.HasWarnings) {
+                foreach (var f in validation.Findings.Where(f => f.Severity == PolicyFindingSeverity.Warning))
+                    Console.WriteLine($"[RELAY WARNING] {f}");
+            }
+
+            return new WorkflowRelay(snapshot) { ValidationResult = validation };
         }
 
         /// <summary>The parsed snapshot — inspect states and transitions if needed.</summary>
         public WorkflowDefinitionSnapshot Snapshot => _snapshot;
+
+        /// <summary>Validation result from registration time — check HasWarnings to surface policy issues.</summary>
+        public PolicyValidationResult ValidationResult { get; private init; } = PolicyValidationResult.Ok();
 
         // ── Transition handler registration ───────────────────────────────────────
 
@@ -114,47 +131,96 @@ namespace Haley.Models {
         public async Task<RelayResult> NextAsync(RelayContext ctx, int eventCode, CancellationToken ct = default) {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
 
+            // For a new initiation, CurrentState is empty — resolve the initial state from the snapshot.
+            if (string.IsNullOrWhiteSpace(ctx.CurrentState)) {
+                var initial = _snapshot.States.FirstOrDefault(s => s.IsInitial);
+                if (initial == null) return RelayResult.Blocked($"{HaleyFlowErrorCodes.RelayNoInitialState}: definition has no state marked is_initial.");
+                ctx.CurrentState = initial.Name;
+            }
+
             var transition = _snapshot.Transitions.FirstOrDefault(t =>
                 string.Equals(t.FromState, ctx.CurrentState, StringComparison.OrdinalIgnoreCase)
                 && t.EventCode == eventCode);
 
             if (transition == null)
-                return RelayResult.Blocked($"InvalidTransition: no transition from '{ctx.CurrentState}' via event code {eventCode}");
+                return RelayResult.Blocked($"{HaleyFlowErrorCodes.RelayInvalidTransition}: no transition from '{ctx.CurrentState}' via event code {eventCode}");
 
             // Monitor intercept before transition handler.
             if (_monitor != null && !await _monitor(eventCode, ctx.EntityRef))
-                return RelayResult.Blocked("BlockedByMonitor");
+                return RelayResult.Blocked(HaleyFlowErrorCodes.RelayBlockedByMonitor);
 
-            // Advance state before hooks — hooks fire in the context of the new state.
-            ctx.CurrentState = transition.ToState;
+            // Resolve parameters for this transition so handlers can read approval rules, roles, etc.
+            ctx.Parameters = transition.ParamCodes.Count > 0
+                ? _snapshot.Parameters.Where(p => transition.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
+                : System.Array.Empty<SnapshotParameter>();
 
             // Run the transition handler if registered.
+            // State has NOT advanced yet — handler executes in the context of the current (from) state.
+            bool transitionSucceeded = true;
+            int? transitionNextCode = null;
             if (_handlers.TryGetValue(eventCode, out var entry)) {
                 ct.ThrowIfCancellationRequested();
-                var succeeded = await entry.Handler(ctx);
+                transitionSucceeded = await entry.Handler(ctx);
 
-                // Resolve next event code via three-tier priority.
-                var nextCode = await ResolveNextCode(succeeded, ctx, entry, transition.CompleteSuccessCode, transition.CompleteFailureCode);
-                if (nextCode.HasValue)
-                    return await NextAsync(ctx, nextCode.Value, ct);
+                // Failure — skip all hooks and fire failure event immediately.
+                if (!transitionSucceeded) {
+                    var failCode = await ResolveNextCode(false, ctx, entry, transition.CompleteSuccessCode, transition.CompleteFailureCode);
+                    if (failCode.HasValue) {
+                        ctx.CurrentState = transition.ToState;
+                        return await NextAsync(ctx, failCode.Value, ct);
+                    }
+                    return RelayResult.Blocked($"{HaleyFlowErrorCodes.RelayTransitionFailed}: event {eventCode}");
+                }
+
+                // Success — hold the next code, run hooks first.
+                transitionNextCode = await ResolveNextCode(true, ctx, entry, transition.CompleteSuccessCode, transition.CompleteFailureCode);
             }
 
-            // Run hook handlers in policy order.
+            // Advance to ToState — hooks fire because we arrived at this state.
+            ctx.CurrentState = transition.ToState;
+
             foreach (var hook in transition.Hooks.OrderBy(h => h.OrderSeq)) {
                 ct.ThrowIfCancellationRequested();
 
                 if (_monitor != null && !await _monitor(eventCode, ctx.EntityRef))
-                    return RelayResult.Blocked("BlockedByMonitor");
+                    return RelayResult.Blocked(HaleyFlowErrorCodes.RelayBlockedByMonitor);
 
                 if (!_hookHandlers.TryGetValue(hook.Route, out var hookEntry)) continue;
 
+                // Resolve parameters for this hook (hook-own params, or inherited from transition rule).
+                ctx.Parameters = hook.ParamCodes.Count > 0
+                    ? _snapshot.Parameters.Where(p => hook.ParamCodes.Contains(p.Code, System.StringComparer.OrdinalIgnoreCase)).ToList()
+                    : System.Array.Empty<SnapshotParameter>();
+
                 var succeeded = await hookEntry.Handler(ctx);
 
-                // Resolve next event code via three-tier priority.
-                var nextCode = await ResolveNextCode(succeeded, ctx, hookEntry, hook.CompleteSuccessCode, hook.CompleteFailureCode);
-                if (nextCode.HasValue)
-                    return await NextAsync(ctx, nextCode.Value, ct);
+                // Non-blocking hooks: ignore result and complete codes entirely.
+                if (!hook.Blocking) continue;
+
+                // Blocking hook failed.
+                if (!succeeded) {
+                    if (hook.CompleteFailureCode.HasValue) {
+                        // Has failure code — skip remaining hooks, fire immediately.
+                        return await NextAsync(ctx, hook.CompleteFailureCode.Value, ct);
+                    }
+                    // No failure path — roll back and stop.
+                    ctx.CurrentState = transition.FromState;
+                    return RelayResult.Blocked($"{HaleyFlowErrorCodes.RelayBlockingHookFailed}: {hook.Route}");
+                }
+
+                // Blocking hook succeeded.
+                if (hook.CompleteSuccessCode.HasValue) {
+                    // Has success code — skip remaining hooks, fire immediately (same as failure termination).
+                    // This is intentional: a success code on a blocking hook means "I resolved this, stop escalating".
+                    return await NextAsync(ctx, hook.CompleteSuccessCode.Value, ct);
+                }
+                // No success code — continue to next hook.
             }
+
+            // All hooks complete with no terminating hook — fall back to transition handler's next code.
+            var finalCode = transitionNextCode;
+            if (finalCode.HasValue)
+                return await NextAsync(ctx, finalCode.Value, ct);
 
             return RelayResult.Ok(ctx.CurrentState);
         }

@@ -43,5 +43,8 @@ namespace Haley.Services {
         public TimeSpan OutboxRetryDelay { get; set; } = TimeSpan.FromMinutes(2);
         /// <summary>Default handler upgrade policy for new instances.</summary>
         public HandlerUpgrade DefaultHandlerUpgrade { get; set; } = HandlerUpgrade.Pinned;
+        /// <summary>Assembly names to scan for wrapper types. Entry assembly is always scanned. If empty, all loaded assemblies are scanned.</summary>
+        [ConfigurationKeyName("wrapper_assemblies")]
+        public List<string> WrapperAssemblies { get; set; } = new();
     }
 }

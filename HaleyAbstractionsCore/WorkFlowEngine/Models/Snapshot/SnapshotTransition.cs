@@ -12,6 +12,10 @@ namespace Haley.Models {
         public int?   CompleteSuccessCode { get; init; }
         /// <summary>Auto-advance event code when the transition handler returns false (failure).</summary>
         public int?   CompleteFailureCode { get; init; }
-        public IReadOnlyList<SnapshotHookRoute> Hooks { get; init; } = System.Array.Empty<SnapshotHookRoute>();
+        public IReadOnlyList<SnapshotHookRoute> Hooks       { get; init; } = System.Array.Empty<SnapshotHookRoute>();
+        /// <summary>Parameter codes referenced by this transition's policy rule. Look these up in WorkflowDefinitionSnapshot.Parameters to get the full data.</summary>
+        public IReadOnlyList<string>            ParamCodes  { get; init; } = System.Array.Empty<string>();
+
+        public override string ToString() => $"[{EventCode}] {EventName} | {FromState} → {ToState}";
     }
 }

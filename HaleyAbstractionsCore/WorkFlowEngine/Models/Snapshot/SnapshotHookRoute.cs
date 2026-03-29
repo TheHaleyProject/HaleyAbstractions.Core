@@ -14,5 +14,9 @@ namespace Haley.Models {
         /// Null if no failure path is defined.
         /// </summary>
         public int?   CompleteFailureCode { get; init; }
+        /// <summary>Parameter codes for this hook. Hook-own params take priority; falls back to parent rule params if empty.</summary>
+        public IReadOnlyList<string> ParamCodes { get; init; } = System.Array.Empty<string>();
+
+        public override string ToString() => $"{Route} | {Label} | order={OrderSeq} blocking={Blocking}{(CompleteSuccessCode.HasValue ? $" ok={CompleteSuccessCode}" : "")}{(CompleteFailureCode.HasValue ? $" fail={CompleteFailureCode}" : "")}";
     }
 }
