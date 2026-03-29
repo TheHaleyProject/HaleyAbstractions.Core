@@ -38,6 +38,8 @@ namespace Haley.Models {
         public HookType? HookType { get; set; }
         /// <summary>Consumer-resolved next event persisted into outbox for post-ACK triggering.</summary>
         public int? NextEvent { get; set; }
+        /// <summary>How the consumer chose NextEvent: Policy, EngineResolved, ConsumerOverride, or empty when none.</summary>
+        public string? NextEventSource { get; set; }
         public int RunCount { get; set; }
         public DateTime Occurred { get; set; }
         public DateTime Created { get; set; }
