@@ -1,3 +1,5 @@
+using Haley.Enums;
+
 namespace Haley.Models {
 
     public sealed class ConsumerTimeline {
@@ -30,6 +32,8 @@ namespace Haley.Models {
         public int? HandlerVersion { get; set; }
         public int? EventCode { get; set; }
         public string? Route { get; set; }
+        /// <summary>Gate or Effect. Null for Transition rows.</summary>
+        public HookType? HookType { get; set; }
         public int RunCount { get; set; }
         public DateTime Occurred { get; set; }
         public DateTime Created { get; set; }
