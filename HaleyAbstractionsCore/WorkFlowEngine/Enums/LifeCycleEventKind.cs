@@ -9,5 +9,6 @@ namespace Haley.Enums {
         //hooks are exact application method that should be called. Application should merely listen to these hooks and then invoke the methods.. Preferably, we will implement a way to auto-invoke these methods using reflection.. but for now, application should listen and invoke the methods. Later, we will implement auto-invocation using reflection inside HaleyEngineItself.. Application merely has to register the methods with HaleyEngine.
         Transition = 1,
         Hook = 2,
+        Complete = 3,
     }
 }
